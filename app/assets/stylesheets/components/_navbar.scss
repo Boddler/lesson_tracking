@@ -1,12 +1,20 @@
-.navbar-lewagon {
-  justify-content: space-between;
-  background: white;
-}
-
-.navbar-lewagon .navbar-collapse {
-  flex-grow: 0;
-}
-
-.navbar-lewagon .navbar-brand img {
+.navbar-brand img {
+  border-radius: 20%;
   width: 40px;
+}
+
+.navbar-lewagon {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background-color: rgb(20,24,48);
+}
+
+.school-icon {
+  border-radius: 50%;
+  background-color: #C0DFA1;
+  padding-inline: 4px;
+
 }
