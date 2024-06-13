@@ -28,6 +28,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_13_065749) do
   end
 
   create_table "updates", force: :cascade do |t|
+    t.integer "yymm"
+    t.string "user_id"
+    t.integer "update_no"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
