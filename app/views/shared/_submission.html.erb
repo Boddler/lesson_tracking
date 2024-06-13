@@ -1,3 +1,9 @@
 <div>
   <h4>Collect Current Lesson Info</h4>
+  <%= simple_form_for @update do |f| %>
+    <%= f.input :user_id %>
+    <%= f.input :password %>
+    <%= f.button :submit %>
+  <% end %>
 </div>
+<%# Need to change labels! %>
