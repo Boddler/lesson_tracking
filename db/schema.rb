@@ -10,8 +10,27 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 0) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_13_065749) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
+  create_table "lessons", force: :cascade do |t|
+    t.bigint "update_id"
+    t.string "time"
+    t.date "date"
+    t.string "code"
+    t.string "ls"
+    t.boolean "peak", default: false
+    t.boolean "booked", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["update_id"], name: "index_lessons_on_update_id"
+  end
+
+  create_table "updates", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  add_foreign_key "lessons", "updates"
 end
