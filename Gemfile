@@ -78,3 +78,4 @@ end
 # Custom
 
 gem "nokogiri"
+gem "mechanize"

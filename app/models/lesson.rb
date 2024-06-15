@@ -1,3 +1,3 @@
 class Lesson < ApplicationRecord
-  belongs_to :update
+  belongs_to :scrape
 end

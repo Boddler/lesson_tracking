@@ -1,6 +1,6 @@
 require "test_helper"
 
-class UpdateTest < ActiveSupport::TestCase
+class ScrapesControllerTest < ActionDispatch::IntegrationTest
   # test "the truth" do
   #   assert true
   # end
