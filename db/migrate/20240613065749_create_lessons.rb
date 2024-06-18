@@ -6,7 +6,9 @@ class CreateLessons < ActiveRecord::Migration[7.1]
       t.date :date
       t.string :code
       t.string :ls
+      t.string :text
       t.boolean :peak, default: false
+      t.boolean :blue, default: false
       t.boolean :booked, default: false
       t.timestamps
     end

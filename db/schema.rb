@@ -20,7 +20,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_13_065749) do
     t.date "date"
     t.string "code"
     t.string "ls"
+    t.string "text"
     t.boolean "peak", default: false
+    t.boolean "blue", default: false
     t.boolean "booked", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
