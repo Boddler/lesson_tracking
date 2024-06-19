@@ -30,7 +30,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_13_065749) do
   end
 
   create_table "scrapes", force: :cascade do |t|
-    t.integer "yymm"
+    t.integer "yyyymm"
     t.string "user_id"
     t.integer "update_no"
     t.datetime "created_at", null: false
