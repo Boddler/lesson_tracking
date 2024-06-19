@@ -67,6 +67,8 @@ end
 
 days(days, peak_times)
 
+pp Date.today.month - Date.today.day
+
 # iterate through each day and create lessons
 # is the first of the month included?
 # go back to the previous week and iterate again
