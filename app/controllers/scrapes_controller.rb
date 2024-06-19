@@ -2,9 +2,9 @@ class ScrapesController < ApplicationController
   def create
     log_in
     @scrape = initial
-    slots = info_pull_1
-    lesson_save(slots)
-    # info_pull_past
+    current = info_pull_1
+    lesson_save(current)
+    past = info_pull_past
     # info_pull_future
   end
 
@@ -24,6 +24,7 @@ class ScrapesController < ApplicationController
       update_no: new_update_no
     )
     instance.save
+    instance
   end
 
 
@@ -40,14 +41,14 @@ class ScrapesController < ApplicationController
     peak_times = ["07:00", "07:50", "08:40", "17:10", "18:00", "18:50", "19:40", "20:30", "21:20"]
     lessons = []
     days.reverse.each do |day|
-      date = day.css("a.day-link").text.strip.to_i
       slots = day.search(".booking")
       peak = day.classes.include?("weekend")
       year = Date.today.year
       slots.each do |slot|
         lesson = {}
-        str = slot.text.strip if date == 18
+        str = slot.text.strip
         next if str.nil?
+        lesson[:scrape_id] = @scrape.id
         lesson[:time] = slot.css(".time").text.strip
         date_str = slot.css(".date-time").text.strip[0, 6]
         lesson[:date] = Date.parse("#{date_str} #{year}")
@@ -64,10 +65,23 @@ class ScrapesController < ApplicationController
     lessons
   end
 
+  def info_pull_past
+
+  end
+
   def lesson_save(lessons)
+    errors = []
     lessons.each do |lesson|
-      Lesson.create(lesson)
-      puts lesson
+      x = Lesson.new(lesson)
+      if x.save
+        puts "Lesson saved successfully"
+      else
+        errors << "#{x.errors.full_messages.join(', ')}"
+      end
     end
+    errors.each do |error|
+      puts error
+    end
+    puts "All saved successfully" if errors.empty?
   end
 end
