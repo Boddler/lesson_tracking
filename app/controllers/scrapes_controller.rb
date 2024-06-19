@@ -2,7 +2,8 @@ class ScrapesController < ApplicationController
   def create
     log_in
     @scrape = initial
-    info_pull_1
+    slots = info_pull_1
+    lesson_save(slots)
     # info_pull_past
     # info_pull_future
   end
@@ -37,6 +38,7 @@ class ScrapesController < ApplicationController
   def info_pull_1
     days = @mechanize.get("https://mgi.gaba.jp/gis/view_schedule-ls/list?jp.co.gaba.targetUserStore=").search(".day")
     peak_times = ["07:00", "07:50", "08:40", "17:10", "18:00", "18:50", "19:40", "20:30", "21:20"]
+    lessons = []
     days.reverse.each do |day|
       date = day.css("a.day-link").text.strip.to_i
       slots = day.search(".booking")
@@ -56,12 +58,16 @@ class ScrapesController < ApplicationController
         lesson[:peak] = peak
         lesson[:blue] = slot.classes.include?("client")
         lesson[:booked] = !slot.classes.include?("available")
-        lesson(lesson)
+        lessons << lesson
       end
     end
+    lessons
   end
 
-  def lesson(lesson)
-    Lesson.create(lesson)
+  def lesson_save(lessons)
+    lessons.each do |lesson|
+      Lesson.create(lesson)
+      puts lesson
+    end
   end
 end
