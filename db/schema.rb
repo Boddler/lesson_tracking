@@ -10,12 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_06_13_065749) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_20_021348) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "lessons", force: :cascade do |t|
-    t.bigint "scrape_id"
     t.string "time"
     t.date "date"
     t.string "code"
@@ -26,7 +25,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_13_065749) do
     t.boolean "booked", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["scrape_id"], name: "index_lessons_on_scrape_id"
   end
 
   create_table "scrapes", force: :cascade do |t|
@@ -37,5 +35,15 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_13_065749) do
     t.datetime "updated_at", null: false
   end
 
-  add_foreign_key "lessons", "scrapes"
+  create_table "slots", force: :cascade do |t|
+    t.bigint "scrape_id"
+    t.bigint "lesson_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["lesson_id"], name: "index_slots_on_lesson_id"
+    t.index ["scrape_id"], name: "index_slots_on_scrape_id"
+  end
+
+  add_foreign_key "slots", "lessons"
+  add_foreign_key "slots", "scrapes"
 end

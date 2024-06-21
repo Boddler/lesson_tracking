@@ -1,6 +1,7 @@
 log in
 create scrape instance
-scan and save lessons on main page
+scan and save lessons on main page if new
 iterate through previous pages until the previous month is hit
 iterate through next pages until the nextx next month is hit
+create joining slot instances for all lessons
 finish

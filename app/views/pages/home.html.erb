@@ -1,7 +1,13 @@
 <div class="container-fluid" style="background-color: #465362">
   <div class="holder">
     <div>
-      <h1>Welcome</h1>
+      <div>
+        <h1>Welcome</h1>
+      </div>
+      <% if @scrape.id %>
+        Hello
+      <% end  %>
+      <%= raise %>
     </div>
     <div class="submission">
       <%= render 'shared/submission' %>

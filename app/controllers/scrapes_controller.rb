@@ -1,32 +1,34 @@
 class ScrapesController < ApplicationController
   def create
+    Slot.destroy_all
+    Scrape.destroy_all
+    Lesson.destroy_all
     log_in
     @scrape = initial
     current = info_pull_1
-    lesson_save(current)
     past = info_pull_past
-    # info_pull_future
+    future = info_pull_future
+    all = current + past + future
+    lesson_save(all)
+    # slots_save()
   end
 
   private
 
   def initial
     today = Date.today
-    # yyyymm = "202405"
-    # yyyymm = "#{today.year}" + "#{0 if today.month < 10}" "#{today.month}".to_i
-    yyyymm = "#{today.year}#{'0' if today.month < 10}#{today.month}".to_i
+    yyyymm = "#{today.year}#{"0" if today.month < 10}#{today.month}".to_i
     user_id = params[:scrape][:user_id]
     last_update_no = Scrape.where(user_id: user_id).where(yyyymm: yyyymm).order(:created_at).last
     new_update_no = last_update_no ? last_update_no.update_no + 1 : 1
     instance = Scrape.new(
       yyyymm: yyyymm,
       user_id: user_id,
-      update_no: new_update_no
+      update_no: new_update_no,
     )
     instance.save
     instance
   end
-
 
   def log_in
     @mechanize = Mechanize.new
@@ -48,7 +50,6 @@ class ScrapesController < ApplicationController
         lesson = {}
         str = slot.text.strip
         next if str.nil?
-        lesson[:scrape_id] = @scrape.id
         lesson[:time] = slot.css(".time").text.strip
         date_str = slot.css(".date-time").text.strip[0, 6]
         lesson[:date] = Date.parse("#{date_str} #{year}")
@@ -66,22 +67,29 @@ class ScrapesController < ApplicationController
   end
 
   def info_pull_past
+    []
+  end
 
+  def info_pull_future
+    []
   end
 
   def lesson_save(lessons)
-    errors = []
     lessons.each do |lesson|
-      x = Lesson.new(lesson)
-      if x.save
-        puts "Lesson saved successfully"
-      else
-        errors << "#{x.errors.full_messages.join(', ')}"
-      end
+      @scrape.add_lesson(lesson)
     end
-    errors.each do |error|
-      puts error
-    end
-    puts "All saved successfully" if errors.empty?
   end
+
+  # def slots_save(x)
+  #   info = {
+  #     scrape_id: @scrape.id,
+  #     lesson_id: x.id,
+  #   }
+  #   slot = Slot.new(info)
+  #   if slot.save
+  #     puts "Slot saved successfully"
+  #   else
+  #     puts "#{x.errors.full_messages}"
+  #   end
+  # end
 end
