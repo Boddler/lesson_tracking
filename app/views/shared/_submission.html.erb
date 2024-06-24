@@ -1,6 +1,6 @@
-<div>
+<div> %>
   <h4>Collect Current Lesson Info</h4>
-  <%= simple_form_for @scrape do |f| %>
+  <%= simple_form_for @scrape, url: results_path do |f| %>
     <%= f.input :user_id, label: 'Instructor ID', input_html: { autocomplete: 'off', value: '' } %>
     <%= f.input :password %>
     <%= f.button :submit, 'Pull Data', class: "btn btn-warning", style: "width: 100%"  %>

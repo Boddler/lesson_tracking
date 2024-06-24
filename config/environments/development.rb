@@ -7,6 +7,7 @@ Rails.application.configure do
   # it changes. This slows down response time but is perfect for development
   # since you don't have to restart the web server when you make code changes.
   config.enable_reloading = true
+  config.hosts.clear
 
   # Do not eager load code on boot.
   config.eager_load = false
@@ -25,7 +26,7 @@ Rails.application.configure do
 
     config.cache_store = :memory_store
     config.public_file_server.headers = {
-      "Cache-Control" => "public, max-age=#{2.days.to_i}"
+      "Cache-Control" => "public, max-age=#{2.days.to_i}",
     }
   else
     config.action_controller.perform_caching = false

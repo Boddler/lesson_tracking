@@ -1,21 +1,28 @@
 class ScrapesController < ApplicationController
-  def create
-    Slot.destroy_all
-    Scrape.destroy_all
-    Lesson.destroy_all
+  def results
+    # Slot.destroy_all
+    # Scrape.destroy_all
+    # Lesson.destroy_all
     log_in
-    @scrape = initial
+    @scrape = start
     current = info_pull_1
     past = info_pull_past
     future = info_pull_future
     all = current + past + future
     lesson_save(all)
-    # slots_save()
+    session[:scrape_id] = @scrape.id
+    redirect_to :display
+  end
+
+  def display
+    @scrape = Scrape.find(session[:scrape_id])
+    @all = Scrape.where(user_id: @scrape.user_id)
+    raise
   end
 
   private
 
-  def initial
+  def start
     today = Date.today
     yyyymm = "#{today.year}#{"0" if today.month < 10}#{today.month}".to_i
     user_id = params[:scrape][:user_id]
