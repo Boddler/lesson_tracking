@@ -38,6 +38,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_20_021348) do
   create_table "slots", force: :cascade do |t|
     t.bigint "scrape_id"
     t.bigint "lesson_id"
+    t.boolean "updated", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["lesson_id"], name: "index_slots_on_lesson_id"

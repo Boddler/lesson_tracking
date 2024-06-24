@@ -1,8 +1,8 @@
 class ScrapesController < ApplicationController
   def results
-    # Slot.destroy_all
-    # Scrape.destroy_all
-    # Lesson.destroy_all
+    Slot.destroy_all
+    Scrape.destroy_all
+    Lesson.destroy_all
     log_in
     @scrape = start
     current = info_pull_1
@@ -15,9 +15,8 @@ class ScrapesController < ApplicationController
   end
 
   def display
-    @scrape = Scrape.find(session[:scrape_id])
-    @all = Scrape.where(user_id: @scrape.user_id)
-    raise
+    scrape = Scrape.find(session[:scrape_id])
+    @all = Scrape.where(user_id: scrape.user_id)
   end
 
   private
