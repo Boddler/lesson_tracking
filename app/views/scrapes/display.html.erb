@@ -1,8 +1,29 @@
 <div class="container-fluid" style="background-color: #465362">
   <div class="holder">
-    <h1>Lessons Updated...</h1>
-    <p>Here are the results of your most recent check...</p>
+    <div>
+      <h1>Lessons Updated...</h1>
+      <p>Here are the results of your most recent check...</p>
+      <table>
+        <tr>
+          <th>Updated Date
+          </th>
+          <th>Updated Time
+          </th>
+          <th>Total +/-
+          </th>
+          <% @all.reverse.each do |scrape| %>
+            <tr>
+              <td><%= scrape.yyyymm %>
+              </td>
+              <td><%= scrape.created_at %>
+              </td>
+              <td><%= scrape.slots.where(updated:true).size %>
+              </td>
+            </tr>
+          <% end %>
+        </table>
+      </div>
+    </div>
+    <div class="holder">
+    </div>
   </div>
-  <div class="holder">
-  </div>
-</div>

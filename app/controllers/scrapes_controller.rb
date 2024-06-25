@@ -1,8 +1,8 @@
 class ScrapesController < ApplicationController
   def results
-    Slot.destroy_all
-    Scrape.destroy_all
-    Lesson.destroy_all
+    # Slot.destroy_all
+    # Scrape.destroy_all
+    # Lesson.destroy_all
     log_in
     @scrape = start
     current = info_pull_1
