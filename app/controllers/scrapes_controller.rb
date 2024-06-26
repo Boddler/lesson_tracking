@@ -59,13 +59,14 @@ class ScrapesController < ApplicationController
         lesson[:time] = slot.css(".time").text.strip
         date_str = slot.css(".date-time").text.strip[0, 6]
         lesson[:date] = Date.parse("#{date_str} #{year}")
-        lesson[:code] = slot.css(".type").text.strip
+
         lesson[:ls] = slot.css(".school").text.strip
         lesson[:text] = slot.css(".textbookname").text.strip
         peak ||= peak_times.include?(lesson[:time])
         lesson[:peak] = peak
         lesson[:blue] = slot.classes.include?("client")
         lesson[:booked] = !slot.classes.include?("available")
+        lesson[:code] = slot.css(".type").text.strip if lesson[:booked]
         lessons << lesson
       end
     end

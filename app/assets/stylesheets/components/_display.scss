@@ -1,14 +1,19 @@
 .holder th {
   border: solid;
-  border-color: #465362;
+  border-color: black;
+  // border-color: #465362;
   margin: auto;
   padding-inline: 0.5rem;
   background-color: #465362;
   color: aqua;
+  text-align: center;
+  vertical-align: middle;
 }
 
 .holder td {
   border: solid;
   padding-inline: 0.5rem;
   margin: auto;
+  text-align: center;
+  vertical-align: middle;
 }

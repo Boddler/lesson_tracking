@@ -5,17 +5,17 @@
       <p>Here are the results of your most recent check...</p>
       <table>
         <tr>
-          <th>Updated Date
+          <th>Month
           </th>
           <th>Updated Time
           </th>
-          <th>Total +/-
+          <th>Total Changes
           </th>
           <% @all.reverse.each do |scrape| %>
             <tr>
-              <td><%= scrape.yyyymm %>
+              <td><%= "#{scrape.yyyymm.to_s[0, 4]}, #{Date::MONTHNAMES[scrape.yyyymm.to_s[4, 2].to_i]}" %>
               </td>
-              <td><%= scrape.created_at %>
+              <td><%= scrape.created_at.strftime("%Y, %b %e - %H:%M") %>
               </td>
               <td><%= scrape.slots.where(updated:true).size %>
               </td>
