@@ -16,7 +16,8 @@ class ScrapesController < ApplicationController
 
   def display
     scrape = Scrape.find(session[:scrape_id])
-    @all = Scrape.where(user_id: scrape.user_id)
+    users_scrapes = Scrape.where(user_id: scrape.user_id)
+    @scrapes_array = users_scrapes.group_by(&:yyyymm)
   end
 
   private

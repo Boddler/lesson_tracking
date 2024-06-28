@@ -5,25 +5,44 @@
       <p>Here are the results of your most recent check...</p>
       <table>
         <tr>
-          <th>Month
-          </th>
-          <th>Updated Time
-          </th>
-          <th>Total Changes
-          </th>
-          <% @all.reverse.each do |scrape| %>
-            <tr>
-              <td><%= "#{scrape.yyyymm.to_s[0, 4]}, #{Date::MONTHNAMES[scrape.yyyymm.to_s[4, 2].to_i]}" %>
-              </td>
-              <td><%= scrape.created_at.strftime("%Y, %b %e - %H:%M") %>
-              </td>
-              <td><%= scrape.slots.where(updated:true).size %>
-              </td>
-            </tr>
-          <% end %>
-        </table>
-      </div>
-    </div>
-    <div class="holder">
+          <th>Month</th>
+          <th>Updated Time</th>
+          <th>Date of Change</th>
+          <th>Time of Change</th>
+          <th>Text</th>
+          <th>Code</th>
+          <th>Blue?</th>
+          <th>Booked/Cancelled</th>
+        </tr>
+        <% @scrapes_array.each do |month| %>
+          <tr>
+            <td rowspan="<%= month[1].map { |scrape| scrape.slots.size }.sum %>"><%= "#{month[0].to_s[0, 4]}, #{Date::MONTHNAMES[month[0].to_s[4, 2].to_i]}" %></td>
+            <% month[1].reverse.each_with_index do |scrape, scrape_index| %>
+              <% scrape.slots.each_with_index do |slot, slot_index| %>
+                <% if scrape_index > 0 || slot_index > 0 %>
+                  <tr>
+                  <% end %>
+                  <% if slot_index == 0 %>
+                    <td rowspan="<%= scrape.slots.size %>"><%= scrape.created_at.strftime("%Y, %b %e - %H:%M") %></td>
+                  <% end %>
+                  <% if slot.updated %>
+                    <td><%= slot.lesson.date %></td>
+                    <td><%= slot.lesson.time %></td>
+                    <td><%= slot.lesson.text %></td>
+                    <td><%= slot.lesson.code %></td>
+                    <td><%= slot.lesson.blue %></td>
+                    <td><%= slot.lesson.booked %></td>
+                    <% if scrape_index > 0 || slot_index > 0 %>
+                    </tr>
+                  <% end %>
+                <% end %>
+              <% end %>
+            <% end %>
+          </tr>
+        <% end %>
+      </table>
     </div>
   </div>
+  <div class="holder">
+  </div>
+</div>
