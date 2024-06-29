@@ -24,6 +24,14 @@
                   <% end %>
                   <% if slot_index == 0 %>
                     <td rowspan="<%= scrape.slots.size %>"><%= scrape.created_at.strftime("%Y, %b %e - %H:%M") %></td>
+                    <% if scrape.slots.where(updated: true).empty? %>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    <% end %>
                   <% end %>
                   <% if slot.updated %>
                     <td><%= slot.lesson.date %></td>
