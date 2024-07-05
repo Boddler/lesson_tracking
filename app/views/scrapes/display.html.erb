@@ -14,7 +14,7 @@
           <th>Blue?</th>
           <th>Booked/Cancelled</th>
         </tr>
-        <% @scrapes_array.each do |month| %>
+        <% @scrapes_array.reverse_each do |month| %>
           <tr>
             <td rowspan="<%= month[1].map { |scrape| scrape.slots.size }.sum %>"><%= "#{month[0].to_s[0, 4]}, #{Date::MONTHNAMES[month[0].to_s[4, 2].to_i]}" %></td>
             <% month[1].reverse.each_with_index do |scrape, scrape_index| %>
