@@ -5,7 +5,7 @@ class ScrapesController < ApplicationController
     # Lesson.destroy_all
     log_in
     @scrape = start
-    current = info_pull_1
+    current = info_pull1
     past = info_pull_past
     future = info_pull_future
     all = current + past + future
@@ -45,11 +45,49 @@ class ScrapesController < ApplicationController
     @mechanize.submit(login_form, login_form.buttons.first)
   end
 
-  def info_pull_1
+  def info_pull1
     days = @mechanize.get("https://mgi.gaba.jp/gis/view_schedule-ls/list?jp.co.gaba.targetUserStore=").search(".day")
+    weekly_parse(days)
+  end
+
+  def info_pull_past
+    root = @mechanize.get("https://mgi.gaba.jp/gis/view_schedule-ls/list?jp.co.gaba.targetUserStore=")
+    past = []
+    x = 1
+    until x == 10
+      link = root.at("a.pull-left")
+      previous_page = @mechanize.click(link)
+      x += 1
+      parsed_data = weekly_parse(previous_page.search(".day"))
+      past.concat(parsed_data) if parsed_data.is_a?(Array)
+      root = previous_page
+      dates = previous_page.search(".day-desc")
+      break if dates[1].text.strip[0, 2].to_i > dates[7].text.strip[0, 2].to_i
+    end
+    past
+  end
+
+  def info_pull_future
+    root = @mechanize.get("https://mgi.gaba.jp/gis/view_schedule-ls/list?jp.co.gaba.targetUserStore=")
+    future = []
+    x = 1
+    until x == 10
+      link = root.at("a.pull-right")
+      break if link.nil?
+
+      next_page = @mechanize.click(link)
+      x += 1
+      parsed_data = weekly_parse(next_page.search(".day"))
+      future.concat(parsed_data) if parsed_data.is_a?(Array)
+      root = next_page
+    end
+    future
+  end
+
+  def weekly_parse(web_page)
     peak_times = ["07:00", "07:50", "08:40", "17:10", "18:00", "18:50", "19:40", "20:30", "21:20"]
     lessons = []
-    days.reverse.each do |day|
+    web_page.reverse.each do |day|
       slots = day.search(".booking")
       peak = day.classes.include?("weekend")
       year = Date.today.year
@@ -57,10 +95,10 @@ class ScrapesController < ApplicationController
         lesson = {}
         str = slot.text.strip
         next if str.nil?
+
         lesson[:time] = slot.css(".time").text.strip
         date_str = slot.css(".date-time").text.strip[0, 6]
         lesson[:date] = Date.parse("#{date_str} #{year}")
-
         lesson[:ls] = slot.css(".school").text.strip
         lesson[:text] = slot.css(".textbookname").text.strip
         peak ||= peak_times.include?(lesson[:time])
@@ -72,14 +110,6 @@ class ScrapesController < ApplicationController
       end
     end
     lessons
-  end
-
-  def info_pull_past
-    []
-  end
-
-  def info_pull_future
-    []
   end
 
   def lesson_save(lessons)

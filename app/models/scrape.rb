@@ -1,5 +1,5 @@
 class Scrape < ApplicationRecord
-  has_many :slots
+  has_many :slots, dependent: :destroy
   has_many :lessons, through: :slots
 
   def add_lesson(attributes)
