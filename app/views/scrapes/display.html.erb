@@ -25,12 +25,12 @@
                   <% if slot_index == 0 %>
                     <td rowspan="<%= scrape.slots.size %>"><%= scrape.created_at.strftime("%Y, %b %e - %H:%M") %></td>
                     <% if scrape.slots.where(updated: true).empty? %>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
+                      <td class="no-updates">No</td>
+                      <td class="no-updates">changes</td>
+                      <td class="no-updates">found</td>
+                      <td class="no-updates">with</td>
+                      <td class="no-updates">this</td>
+                      <td class="no-updates">update</td>
                     <% end %>
                   <% end %>
                   <% if slot.updated %>

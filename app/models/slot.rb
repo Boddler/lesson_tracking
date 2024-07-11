@@ -13,3 +13,5 @@ class Slot < ApplicationRecord
     self.updated = !existing_record
   end
 end
+
+# add a bit that only adds a slot/adds updated status if the slot has either been booked or cancelled
