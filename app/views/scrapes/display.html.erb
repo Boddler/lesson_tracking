@@ -33,7 +33,7 @@
                       <td class="no-updates">update</td>
                     <% end %>
                   <% end %>
-                  <% if slot.updated %>
+                  <% if slot.updated && slot.lesson.booked %>
                     <td><%= slot.lesson.date %></td>
                     <td><%= slot.lesson.time %></td>
                     <td><%= slot.lesson.text %></td>
