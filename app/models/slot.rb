@@ -12,6 +12,19 @@ class Slot < ApplicationRecord
                           .exists?
     self.updated = !existing_record
   end
+
+  def matching_lesson
+    return unless updated && !lesson.booked
+
+    previous_scrape = Scrape.find_by(update_no: scrape.update_no - 1)
+    return unless previous_scrape
+
+    Lesson.joins(:slots)
+          .where(slots: { scrape_id: previous_scrape.id })
+          .where(date: lesson.date, time: lesson.time)
+          .first
+  end
 end
 
-# add a bit that only adds a slot/adds updated status if the slot has either been booked or cancelled
+# matching_lesson only works within the same month
+# I think I need to add a user id match to it too

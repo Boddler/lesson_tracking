@@ -44,13 +44,25 @@
                     </tr>
                   <% end %>
                 <% end %>
+                <% lesson = slot.matching_lesson %>
+                <% if lesson %>
+                  <td class="cancelled"><%= lesson.date %></td>
+                  <td class="cancelled"><%= lesson.time %></td>
+                  <td class="cancelled"><%= lesson.text %></td>
+                  <td class="cancelled"><%= lesson.code %></td>
+                  <td class="cancelled"><%= lesson.blue %></td>
+                  <td class="cancelled"><%= lesson.booked %></td>
+                  <% if scrape_index > 0 || slot_index > 0 %>
+                  </tr>
+                <% end %>
               <% end %>
             <% end %>
-          </tr>
-        <% end %>
-      </table>
-    </div>
+          <% end %>
+        </tr>
+      <% end %>
+    </table>
   </div>
-  <div class="holder">
-  </div>
+</div>
+<div class="holder">
+</div>
 </div>
