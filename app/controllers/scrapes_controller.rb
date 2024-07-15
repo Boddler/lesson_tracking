@@ -11,13 +11,16 @@ class ScrapesController < ApplicationController
     all = current + past + future
     lesson_save(all)
     session[:scrape_id] = @scrape.id
+    @scrape.lesson_count
     redirect_to :display
   end
 
   def display
-    scrape = Scrape.find(session[:scrape_id])
+    scrape = Scrape.last
+    # scrape = Scrape.find(session[:scrape_id])
     users_scrapes = Scrape.where(user_id: scrape.user_id)
-    @scrapes_array = users_scrapes.group_by(&:yyyymm)
+    prep = users_scrapes.sort_by(&:created_at)
+    @scrapes_array = prep.group_by(&:yyyymm)
   end
 
   private
@@ -117,17 +120,4 @@ class ScrapesController < ApplicationController
       @scrape.add_lesson(lesson)
     end
   end
-
-  # def slots_save(x)
-  #   info = {
-  #     scrape_id: @scrape.id,
-  #     lesson_id: x.id,
-  #   }
-  #   slot = Slot.new(info)
-  #   if slot.save
-  #     puts "Slot saved successfully"
-  #   else
-  #     puts "#{x.errors.full_messages}"
-  #   end
-  # end
 end

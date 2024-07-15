@@ -4,19 +4,16 @@
       <h1>Lessons Updated...</h1>
       <p>Here are the results of your most recent check...</p>
       <table>
-        <tr>
-          <th>Month</th>
-          <th>Updated Time</th>
-          <th>Date of Change</th>
-          <th>Time of Change</th>
-          <th>Text</th>
-          <th>Code</th>
-          <th>Blue?</th>
-          <th>Booked/Cancelled</th>
-        </tr>
         <% @scrapes_array.reverse_each do |month| %>
+          <%= render "shared/table_hdr1", scrape: month %>
           <tr>
-            <td rowspan="<%= month[1].map { |scrape| scrape.slots.size }.sum %>"><%= "#{month[0].to_s[0, 4]}, #{Date::MONTHNAMES[month[0].to_s[4, 2].to_i]}" %></td>
+            <th>Date of Change</th>
+            <th>Time of Change</th>
+            <th>Text</th>
+            <th>Code</th>
+            <th>Blue?</th>
+          </tr>
+          <tr>
             <% month[1].reverse.each_with_index do |scrape, scrape_index| %>
               <% scrape.slots.each_with_index do |slot, slot_index| %>
                 <% if scrape_index > 0 || slot_index > 0 %>
@@ -28,7 +25,6 @@
                       <td class="no-updates">No</td>
                       <td class="no-updates">changes</td>
                       <td class="no-updates">found</td>
-                      <td class="no-updates">with</td>
                       <td class="no-updates">this</td>
                       <td class="no-updates">update</td>
                     <% end %>
@@ -38,8 +34,7 @@
                     <td><%= slot.lesson.time %></td>
                     <td><%= slot.lesson.text %></td>
                     <td><%= slot.lesson.code %></td>
-                    <td><%= slot.lesson.blue %></td>
-                    <td><%= slot.lesson.booked %></td>
+                    <td class="<%="blue-lsn" if slot.lesson.blue %>"></td>
                     <% if scrape_index > 0 || slot_index > 0 %>
                     </tr>
                   <% end %>
@@ -50,8 +45,7 @@
                   <td class="cancelled"><%= lesson.time %></td>
                   <td class="cancelled"><%= lesson.text %></td>
                   <td class="cancelled"><%= lesson.code %></td>
-                  <td class="cancelled"><%= lesson.blue %></td>
-                  <td class="cancelled"><%= lesson.booked %></td>
+                  <td class="<%="blue-lsn" if lesson.blue %>"></td>
                   <% if scrape_index > 0 || slot_index > 0 %>
                   </tr>
                 <% end %>
