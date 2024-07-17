@@ -5,7 +5,7 @@
   <th>Total +/-</th>
 </tr>
 <tr>
-  <td><%= "#{scrape[0].to_s[0, 4]}, #{Date::MONTHNAMES[scrape[0].to_s[4, 2].to_i]}" %></th>
+  <td><%= date_title(scrape) %></th>
   <td colspan="2">Blue Bookings +/-</td>
   <td colspan="2">Red/Black Bookings +/-</td>
   <td>Total +/-</td>

@@ -32,7 +32,7 @@
                   <% if slot.updated && slot.lesson.booked %>
                     <td><%= slot.lesson.date %></td>
                     <td><%= slot.lesson.time %></td>
-                    <td><%= slot.lesson.text %></td>
+                    <td><%= text_title(slot.lesson.text) %></td>
                     <td><%= slot.lesson.code %></td>
                     <td class="<%="blue-lsn" if slot.lesson.blue %>"></td>
                     <% if scrape_index > 0 || slot_index > 0 %>
@@ -43,7 +43,7 @@
                 <% if lesson %>
                   <td class="cancelled"><%= lesson.date %></td>
                   <td class="cancelled"><%= lesson.time %></td>
-                  <td class="cancelled"><%= lesson.text %></td>
+                  <td class="cancelled"><%= text_title(lesson.text) %></td>
                   <td class="cancelled"><%= lesson.code %></td>
                   <td class="<%="blue-lsn" if lesson.blue %>"></td>
                   <% if scrape_index > 0 || slot_index > 0 %>
@@ -55,6 +55,11 @@
         </tr>
       <% end %>
     </table>
+  </div>
+  <div>
+    <h1>Monthly Summaries</h1>
+    <div>
+    </div>
   </div>
 </div>
 <div class="holder">

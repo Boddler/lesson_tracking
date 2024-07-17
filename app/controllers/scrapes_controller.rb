@@ -4,15 +4,30 @@ class ScrapesController < ApplicationController
     # Scrape.destroy_all
     # Lesson.destroy_all
     log_in
-    @scrape = start
-    current = info_pull1
-    past = info_pull_past
-    future = info_pull_future
-    all = current + past + future
-    lesson_save(all)
+    today = Date.today
+    2.times do
+      @scrape = start(today)
+      current = info_pull1
+      past = info_pull_past
+      future = info_pull_future
+      all = current + past + future
+      month_cut(all, today)
+      lesson_save(all)
+      @scrape.lesson_count(today)
+      today = today.next_month
+    end
     session[:scrape_id] = @scrape.id
-    @scrape.lesson_count
+    # @scrape.lesson_count(Date.today.next_month)
     redirect_to :display
+  end
+
+  def month_cut(lessons, day)
+    if day.month == Date.today.month
+      lessons.reject { |lesson| lesson[:date] > day.end_of_month }
+    else
+      lessons.reject { |lesson| lesson[:date] < day.at_beginning_of_month }
+    end
+    lessons
   end
 
   def display
@@ -21,13 +36,14 @@ class ScrapesController < ApplicationController
     users_scrapes = Scrape.where(user_id: scrape.user_id)
     prep = users_scrapes.sort_by(&:created_at)
     @scrapes_array = prep.group_by(&:yyyymm)
+    # Need to make the summary array
+    # @summaries = prep.sort_by {}
   end
 
   private
 
-  def start
-    today = Date.today
-    yyyymm = "#{today.year}#{"0" if today.month < 10}#{today.month}".to_i
+  def start(day)
+    yyyymm = "#{day.year}#{"0" if day.month < 10}#{day.month}".to_i
     user_id = params[:scrape][:user_id]
     last_update_no = Scrape.where(user_id: user_id).where(yyyymm: yyyymm).order(:created_at).last
     new_update_no = last_update_no ? last_update_no.update_no + 1 : 1

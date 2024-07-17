@@ -19,26 +19,22 @@ class Scrape < ApplicationRecord
     end
   end
 
-  def lesson_count
-    current_month = Date.today.month
+  def lesson_count(date)
+    month = date.month
     blues = slots.joins(:lesson)
                  .where(lessons: { booked: true, blue: true })
-                 .where("EXTRACT(MONTH FROM date) = ?", current_month)
+                 .where("EXTRACT(MONTH FROM date) = ?", month)
                  .count
     reds = slots.joins(:lesson)
                 .where(lessons: { booked: true, blue: false })
-                .where("EXTRACT(MONTH FROM date) = ?", current_month)
+                .where("EXTRACT(MONTH FROM date) = ?", month)
                 .count
-    # total = blues + reds
-    comp_this ||= {}
-    comp_this[:reds] = reds
-    comp_this[:blues] = blues
-    puts "Comp_this: #{comp_this}"
-    update_attribute(:comp_this, comp_this)
-    if save
-      "Saved!"
-    else
-      puts "Error updating lesson count: #{errors.full_messages.join(", ")}"
-    end
+    total = blues + reds
+    comp ||= {}
+    comp[:reds] = reds
+    comp[:blues] = blues
+    comp[:total] = total
+    update_attribute(:comp_this, comp)
+    puts "Error updating lesson count: #{errors.full_messages.join(", ")}" unless save
   end
 end
