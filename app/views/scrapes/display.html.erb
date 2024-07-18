@@ -58,6 +58,11 @@
   </div>
   <div>
     <h1>Monthly Summaries</h1>
+    <% @scrapes_array.each do |scrape| %>
+      <%= scrape[1].last.created_at %>
+      <br>
+      <br>
+    <% end %>
     <div>
     </div>
   </div>

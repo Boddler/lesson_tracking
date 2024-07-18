@@ -4,17 +4,17 @@ class ScrapesController < ApplicationController
     # Scrape.destroy_all
     # Lesson.destroy_all
     log_in
-    today = Date.today
-    2.times do
-      @scrape = start(today)
+    day = Date.today.months_ago(1)
+    3.times do
+      @scrape = start(day)
       current = info_pull1
       past = info_pull_past
       future = info_pull_future
       all = current + past + future
-      month_cut(all, today)
-      lesson_save(all)
-      @scrape.lesson_count(today)
-      today = today.next_month
+      trimmed_lsns = month_cut(all, day)
+      lesson_save(trimmed_lsns)
+      @scrape.lesson_count(day)
+      day = day.next_month
     end
     session[:scrape_id] = @scrape.id
     # @scrape.lesson_count(Date.today.next_month)
@@ -22,12 +22,7 @@ class ScrapesController < ApplicationController
   end
 
   def month_cut(lessons, day)
-    if day.month == Date.today.month
-      lessons.reject { |lesson| lesson[:date] > day.end_of_month }
-    else
-      lessons.reject { |lesson| lesson[:date] < day.at_beginning_of_month }
-    end
-    lessons
+    lessons.select { |lesson| lesson[:date].month == day.month }
   end
 
   def display
