@@ -15,6 +15,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_14_120312) do
   enable_extension "plpgsql"
 
   create_table "lessons", force: :cascade do |t|
+    t.bigint "scrape_id"
     t.string "time"
     t.date "date"
     t.string "code"
@@ -25,6 +26,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_14_120312) do
     t.boolean "booked", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["scrape_id"], name: "index_lessons_on_scrape_id"
   end
 
   create_table "scrapes", force: :cascade do |t|
@@ -47,6 +49,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_14_120312) do
     t.index ["scrape_id"], name: "index_slots_on_scrape_id"
   end
 
+  add_foreign_key "lessons", "scrapes"
   add_foreign_key "slots", "lessons"
   add_foreign_key "slots", "scrapes"
 end
