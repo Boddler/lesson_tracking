@@ -1,5 +1,5 @@
 class ScrapesController < ApplicationController
-  def results
+  def create
     # Slot.destroy_all
     # Scrape.destroy_all
     # Lesson.destroy_all
@@ -17,25 +17,45 @@ class ScrapesController < ApplicationController
       day = day.next_month
     end
     session[:scrape_id] = @scrape.id
-    # @scrape.lesson_count(Date.today.next_month)
-    redirect_to :display
+    redirect_to scrapes_path
   end
 
-  def month_cut(lessons, day)
-    lessons.select { |lesson| lesson[:date].month == day.month }
-  end
-
-  def display
+  def index
     scrape = Scrape.last
     # scrape = Scrape.find(session[:scrape_id])
     users_scrapes = Scrape.where(user_id: scrape.user_id)
     prep = users_scrapes.sort_by(&:created_at)
     @scrapes_array = prep.group_by(&:yyyymm)
+    @recent = prep.last(3)
     # Need to make the summary array
     # @summaries = prep.sort_by {}
   end
 
+  def destroy
+    ActiveRecord::Base.transaction do
+      begin
+        @scrape = Scrape.find(params[:id])
+        scrape_1 = Scrape.find_by(id: @scrape.id - 1)
+        scrape_2 = Scrape.find_by(id: @scrape.id - 2)
+
+        @scrape.destroy!
+        scrape_1&.destroy!
+        scrape_2&.destroy!
+
+        flash[:notice] = "Latest info pull deleted"
+        redirect_to scrapes_path
+      rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordNotDestroyed => e
+        flash[:notice] = "Error in deleting the info: #{e.message}"
+        redirect_to scrapes_path
+      end
+    end
+  end
+
   private
+
+  def month_cut(lessons, day)
+    lessons.select { |lesson| lesson[:date].month == day.month }
+  end
 
   def start(day)
     yyyymm = "#{day.year}#{"0" if day.month < 10}#{day.month}".to_i

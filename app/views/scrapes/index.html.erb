@@ -1,0 +1,41 @@
+<div class="container-fluid" style="background-color: #465362">
+  <div class="holder">
+    <div>
+      <h1>Lessons Updated...</h1>
+      <h6>Here are the results of your most recent check...</h6>
+      <table>
+        <%= render "shared/table_smry", recent: @recent %>
+        <%= render "shared/slot", month: @recent %>
+        <tr>
+        </tr>
+        <tr class="invisible-row">
+          <td colspan="100%" class="invisible-row" style="border: none">
+          </td>
+        </tr>
+        <tr>
+          <th class="month table-top", colspan="100%">
+            Detailed Information...
+          </th>
+        </tr>
+        <% @scrapes_array.reverse_each do |month| %>
+          <%= render "shared/table_hdr1", scrape: month %>
+          <%= render "shared/slot", month: month[1] %>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+  <div style="min-width: 8px"></div>
+  <div>
+    <h1>Monthly Summaries</h1>
+    <% @scrapes_array.each do |scrape| %>
+      <%= render "shared/smry", recent: @recent %>
+      <br>
+      <br>
+    <% end %>
+    <div>
+    </div>
+  </div>
+</div>
+<div class="holder">
+</div>
+</div>

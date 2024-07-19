@@ -1,0 +1,49 @@
+<tr>
+  <th>Time of info Pull</th>
+  <th>Lesson Date</th>
+  <th>Lesson Time</th>
+  <th>Text</th>
+  <th>Code</th>
+  <th>Blue?</th>
+</tr>
+<tr>
+  <% month.reverse.each_with_index do |scrape, scrape_index| %>
+    <% scrape.slots.each_with_index do |slot, slot_index| %>
+      <% if scrape_index > 0 || slot_index > 0 %>
+        <tr>
+        <% end %>
+        <% if slot_index == 0 %>
+          <% if Date.today.at_beginning_of_month <= scrape.slots.last.lesson.date %>
+            <td rowspan="<%= scrape.slots.size %>"><%= scrape.created_at.strftime("%Y, %b %e - %H:%M") %></td>
+            <% if scrape.slots.where(updated: true).empty? %>
+              <td class="no-updates">No</td>
+              <td class="no-updates">changes</td>
+              <td class="no-updates">found</td>
+              <td class="no-updates">this</td>
+              <td class="no-updates">update</td>
+            <% end %>
+          <% end %>
+        <% end %>
+        <% if slot.updated && slot.lesson.booked %>
+          <td><%= slot.lesson.date %></td>
+          <td><%= slot.lesson.time %></td>
+          <td><%= text_title(slot.lesson.text) %></td>
+          <td><%= slot.lesson.code %></td>
+          <td class="<%="blue-lsn" if slot.lesson.blue %>"></td>
+          <% if scrape_index > 0 || slot_index > 0 %>
+          </tr>
+        <% end %>
+      <% end %>
+      <% lesson = slot.matching_lesson %>
+      <% if lesson %>
+        <td class="cancelled"><%= lesson.date %></td>
+        <td class="cancelled"><%= lesson.time %></td>
+        <td class="cancelled"><%= text_title(lesson.text) %></td>
+        <td class="cancelled"><%= lesson.code %></td>
+        <td class="<%="blue-lsn" if lesson.blue %>"></td>
+        <% if scrape_index > 0 || slot_index > 0 %>
+        </tr>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

@@ -1,0 +1,5 @@
+<th class="month table-top", colspan="100">Latest Info Pull Summary
+  <%= link_to scrape_path(recent.last), data: { turbo_method: :delete, turbo_confirm: "Delete the latest info?" } do %>
+    <i class="fa-solid fa-trash-can card-list-event-delete" style="color: aqua;"></i>
+  <% end %>
+</th>
