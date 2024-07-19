@@ -1,1 +1,16 @@
-Hello
+<table>
+  <th>Month</th>
+  <th>Blues</th>
+  <th>Reds</th>
+  <th>Total</th>
+  <% recent.reverse.each do |scrape| %>
+    <tr>
+      <th>
+        <%= date_title([scrape.yyyymm]) %>
+      </th>
+      <td><%= scrape.lessons.where(blue: true).count %></td>
+      <td><%= scrape.lessons.where(blue: false).where(booked: true).count %></td>
+      <td><%= scrape.lessons.where(booked: true).count %></td>
+    </tr>
+  <% end %>
+</table>

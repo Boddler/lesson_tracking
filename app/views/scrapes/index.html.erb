@@ -27,11 +27,7 @@
   <div style="min-width: 8px"></div>
   <div>
     <h1>Monthly Summaries</h1>
-    <% @scrapes_array.each do |scrape| %>
-      <%= render "shared/smry", recent: @recent %>
-      <br>
-      <br>
-    <% end %>
+    <%= render "shared/smry", recent: @recent %>
     <div>
     </div>
   </div>
