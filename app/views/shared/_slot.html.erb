@@ -13,7 +13,6 @@
         <tr>
         <% end %>
         <% if slot_index == 0 %>
-          <% if Date.today.at_beginning_of_month <= scrape.slots.last.lesson.date %>
             <td rowspan="<%= scrape.slots.size %>"><%= scrape.created_at.strftime("%Y, %b %e - %H:%M") %></td>
             <% if scrape.slots.where(updated: true).empty? %>
               <td class="no-updates">No</td>
@@ -22,7 +21,6 @@
               <td class="no-updates">this</td>
               <td class="no-updates">update</td>
             <% end %>
-          <% end %>
         <% end %>
         <% if slot.updated && slot.lesson.booked %>
           <td><%= slot.lesson.date %></td>

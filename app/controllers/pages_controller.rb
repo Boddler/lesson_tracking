@@ -5,15 +5,4 @@ class PagesController < ApplicationController
 
   def about
   end
-
-  def new
-  end
-
-  def create
-    raise
-  end
-
-  def update
-    raise
-  end
 end

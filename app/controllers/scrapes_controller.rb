@@ -8,7 +8,7 @@ class ScrapesController < ApplicationController
     3.times do
       @scrape = start(day)
       current = info_pull1
-      past = info_pull_past
+      past = info_pull_past(day)
       future = info_pull_future
       all = current + past + future
       trimmed_lsns = month_cut(all, day)
@@ -43,7 +43,11 @@ class ScrapesController < ApplicationController
         scrape_2&.destroy!
 
         flash[:notice] = "Latest info pull deleted"
-        redirect_to scrapes_path
+        if Scrape.last
+            redirect_to scrapes_path
+          else
+            redirect_to root_path
+          end
       rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordNotDestroyed => e
         flash[:notice] = "Error in deleting the info: #{e.message}"
         redirect_to scrapes_path
@@ -84,7 +88,7 @@ class ScrapesController < ApplicationController
     weekly_parse(days)
   end
 
-  def info_pull_past
+  def info_pull_past(day)
     root = @mechanize.get("https://mgi.gaba.jp/gis/view_schedule-ls/list?jp.co.gaba.targetUserStore=")
     past = []
     x = 1
@@ -95,8 +99,8 @@ class ScrapesController < ApplicationController
       parsed_data = weekly_parse(previous_page.search(".day"))
       past.concat(parsed_data) if parsed_data.is_a?(Array)
       root = previous_page
-      dates = previous_page.search(".day-desc")
-      break if dates[1].text.strip[0, 2].to_i > dates[7].text.strip[0, 2].to_i
+      # dates = previous_page.search(".day-desc")
+      # break if dates[1].text.strip[0, 2].to_i > dates[7].text.strip[0, 2].to_i unless day < Date.today
     end
     past
   end
