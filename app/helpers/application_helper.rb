@@ -1,6 +1,6 @@
 module ApplicationHelper
   def date_title(yyyymm)
-    "#{yyyymm[0].to_s[0, 4]}, #{Date::MONTHNAMES[yyyymm[0].to_s[4, 2].to_i]}"
+    "#{yyyymm[0].to_s[0, 4]}, #{Date::ABBR_MONTHNAMES[yyyymm[0].to_s[4, 2].to_i]}"
   end
 
   def text_title(text)

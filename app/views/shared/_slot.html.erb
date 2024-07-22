@@ -1,5 +1,5 @@
 <tr>
-  <th>Time of info Pull</th>
+  <th> <%= month.size == 2 ? "Month" : "Time of info Pull" %> </th>
   <th>Lesson Date</th>
   <th>Lesson Time</th>
   <th>Text</th>
@@ -13,14 +13,18 @@
         <tr>
         <% end %>
         <% if slot_index == 0 %>
+          <% if month.size == 2 %>
+            <th rowspan="<%= scrape.slots.size %>"><%= Date::MONTHNAMES[scrape.yyyymm.to_s[4, 2].to_i] %></th>
+          <% else %>
             <td rowspan="<%= scrape.slots.size %>"><%= scrape.created_at.strftime("%Y, %b %e - %H:%M") %></td>
-            <% if scrape.slots.where(updated: true).empty? %>
-              <td class="no-updates">No</td>
-              <td class="no-updates">changes</td>
-              <td class="no-updates">found</td>
-              <td class="no-updates">this</td>
-              <td class="no-updates">update</td>
-            <% end %>
+          <% end %>
+          <% if scrape.slots.where(updated: true).empty? %>
+            <td class="no-updates">No</td>
+            <td class="no-updates">changes</td>
+            <td class="no-updates">found</td>
+            <td class="no-updates">this</td>
+            <td class="no-updates">update</td>
+          <% end %>
         <% end %>
         <% if slot.updated && slot.lesson.booked %>
           <td><%= slot.lesson.date %></td>

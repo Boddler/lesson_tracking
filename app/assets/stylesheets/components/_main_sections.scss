@@ -1,10 +1,14 @@
 .holder {
-  display: flex;
   background-color: #82a3a1;
   padding: 16px;
-  justify-content: space-between;
+  margin: 0 auto;
   max-width: 70%;
-  margin: auto;
+}
+
+.flex {
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
 }
 
 .submission {
@@ -15,11 +19,19 @@
   min-height: 200px;
   padding: 8px;
   box-shadow: 0 1px 2px rgba(0,0,0,0.6);
-  }
+}
 
-.holder h1 {
+.welcome-banner h1 {
+  box-shadow: 0 1px 2px rgba(0,0,0,0.6);
+  border-radius: 5px;
+}
+
+h1 {
   background-color: #465362;
   padding: 8px;
-  border-radius: 5px;
+}
+
+table {
+  margin: 0 auto;
   box-shadow: 0 1px 2px rgba(0,0,0,0.6);
 }
