@@ -3,7 +3,7 @@ class Scrape < ApplicationRecord
   has_many :lessons, through: :slots
 
   def add_lesson(attributes)
-    lesson = Lesson.find_or_create_by(attributes)
+    lesson = Lesson.find_or_create_by_attributes(attributes)
 
     if lesson.persisted?
       slot = slots.find_or_create_by(lesson: lesson)

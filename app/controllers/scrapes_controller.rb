@@ -8,7 +8,7 @@ class ScrapesController < ApplicationController
     3.times do
       @scrape = start(day)
       current = info_pull1
-      past = info_pull_past(day)
+      past = info_pull_past
       future = info_pull_future
       all = current + past + future
       trimmed_lsns = month_cut(all, day)
@@ -25,7 +25,7 @@ class ScrapesController < ApplicationController
     # scrape = Scrape.find(session[:scrape_id])
     users_scrapes = Scrape.where(user_id: scrape.user_id)
     prep = users_scrapes.sort_by(&:created_at)
-    @scrapes_array = prep.group_by(&:yyyymm)
+    @scrapes_array = prep.group_by(&:yyyymm).sort_by { |array| array[0] }.reverse
     @recent = prep.last(3)
     # Need to make the summary array
     # @summaries = prep.sort_by {}
@@ -44,10 +44,10 @@ class ScrapesController < ApplicationController
 
         flash[:notice] = "Latest info pull deleted"
         if Scrape.last
-            redirect_to scrapes_path
-          else
-            redirect_to root_path
-          end
+          redirect_to scrapes_path
+        else
+          redirect_to root_path
+        end
       rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordNotDestroyed => e
         flash[:notice] = "Error in deleting the info: #{e.message}"
         redirect_to scrapes_path
@@ -64,8 +64,8 @@ class ScrapesController < ApplicationController
   def start(day)
     yyyymm = "#{day.year}#{"0" if day.month < 10}#{day.month}".to_i
     user_id = params[:scrape][:user_id]
-    last_update_no = Scrape.where(user_id: user_id).where(yyyymm: yyyymm).order(:created_at).last
-    new_update_no = last_update_no ? last_update_no.update_no + 1 : 1
+    last_update = Scrape.where(user_id: user_id).where(yyyymm: yyyymm).order(:created_at).last
+    new_update_no = last_update ? last_update.update_no + 1 : 1
     instance = Scrape.new(
       yyyymm: yyyymm,
       user_id: user_id,
@@ -88,7 +88,7 @@ class ScrapesController < ApplicationController
     weekly_parse(days)
   end
 
-  def info_pull_past(day)
+  def info_pull_past
     root = @mechanize.get("https://mgi.gaba.jp/gis/view_schedule-ls/list?jp.co.gaba.targetUserStore=")
     past = []
     x = 1
@@ -151,8 +151,6 @@ class ScrapesController < ApplicationController
   end
 
   def lesson_save(lessons)
-    lessons.each do |lesson|
-      @scrape.add_lesson(lesson)
-    end
+    lessons.each { |lesson| @scrape.add_lesson(lesson) }
   end
 end

@@ -17,7 +17,7 @@
             Detailed Information...
           </th>
         </tr>
-        <% @scrapes_array.reverse_each do |month| %>
+        <% @scrapes_array.each do |month| %>
           <%= render "shared/table_hdr1", scrape: month %>
           <%= render "shared/slot", month: month[1] %>
         </tr>

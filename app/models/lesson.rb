@@ -8,7 +8,8 @@ class Lesson < ApplicationRecord
   end
 
   def self.find_or_create_by_attributes(attributes)
+    attributes[:text] = "Unknown" if attributes[:text].blank? && attributes[:booked]
     sanitised_attributes = attributes.except("id", "created_at", "updated_at")
-    Lesson.find_by(sanitised_attributes) || Lesson.create(sanitised_attributes)
+    find_by(sanitised_attributes) || create(sanitised_attributes)
   end
 end
