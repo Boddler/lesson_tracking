@@ -81,8 +81,17 @@
   color: aqua;
   background: #465362;
   border: solid;
+  padding: 8px;
 }
 
 .show {
   display: none;
+  opacity: 0;
+  transition: opacity 5s ease;
+}
+
+.related {
+  background: red;
+  font-weight: bolder;
+  border: solid , black;
 }

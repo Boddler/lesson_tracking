@@ -1,8 +1,5 @@
 class ScrapesController < ApplicationController
   def create
-    # Slot.destroy_all
-    # Scrape.destroy_all
-    # Lesson.destroy_all
     log_in
     day = Date.today.months_ago(1)
     3.times do
@@ -27,8 +24,6 @@ class ScrapesController < ApplicationController
     prep = users_scrapes.sort_by(&:created_at)
     @scrapes_array = prep.group_by(&:yyyymm).sort_by { |array| array[0] }.reverse
     @recent = prep.last(3)
-    # Need to make the summary array
-    # @summaries = prep.sort_by {}
   end
 
   def destroy

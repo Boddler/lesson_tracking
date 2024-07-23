@@ -8,7 +8,7 @@ class Slot < ApplicationRecord
     scrape = Scrape.find(scrape_id)
     previous_update_no = scrape.update_no - 1
     existing_record = Slot.joins(:scrape)
-                          .where(scrapes: { update_no: previous_update_no }, lesson_id: lesson_id)
+                          .where(scrapes: { update_no: previous_update_no, user_id: scrape.user_id }, lesson_id: lesson_id)
                           .exists?
     self.updated = !existing_record
   end
