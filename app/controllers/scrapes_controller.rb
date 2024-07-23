@@ -1,26 +1,33 @@
 class ScrapesController < ApplicationController
   def create
-    log_in
-    day = Date.today.months_ago(1)
-    3.times do
-      @scrape = start(day)
-      current = info_pull1
-      past = info_pull_past
-      future = info_pull_future
-      all = current + past + future
-      trimmed_lsns = month_cut(all, day)
-      lesson_save(trimmed_lsns)
-      @scrape.lesson_count(day)
-      day = day.next_month
+    submission = log_in
+    if submission.links[0].text == "INSTRUCTOR PROFILE"
+      day = Date.today.months_ago(1)
+      3.times do
+        @scrape = start(day)
+        current = info_pull1(day)
+        past = info_pull_past(day)
+        future = info_pull_future(day)
+        all = current + past + future
+        trimmed_lsns = month_cut(all, day)
+        lesson_save(trimmed_lsns)
+        @scrape.lesson_count(day)
+        day = day.next_month
+      end
+      session[:scrape_id] = @scrape.id
+      @username = params[:scrape][:user_id]
+      raise
+      redirect_to scrapes_path
+    else
+      flash[:notice] = "Log in failed - please retry"
+      redirect_to root_path
     end
-    session[:scrape_id] = @scrape.id
-    redirect_to scrapes_path
   end
 
   def index
-    scrape = Scrape.last
-    # scrape = Scrape.find(session[:scrape_id])
-    users_scrapes = Scrape.where(user_id: scrape.user_id)
+    # scrape = Scrape.last
+
+    users_scrapes = Scrape.where(user_id: @username)
     prep = users_scrapes.sort_by(&:created_at)
     @scrapes_array = prep.group_by(&:yyyymm).sort_by { |array| array[0] }.reverse
     @recent = prep.last(3)
@@ -78,12 +85,12 @@ class ScrapesController < ApplicationController
     @mechanize.submit(login_form, login_form.buttons.first)
   end
 
-  def info_pull1
+  def info_pull1(date)
     days = @mechanize.get("https://mgi.gaba.jp/gis/view_schedule-ls/list?jp.co.gaba.targetUserStore=").search(".day")
-    weekly_parse(days)
+    weekly_parse(days, date)
   end
 
-  def info_pull_past
+  def info_pull_past(date)
     root = @mechanize.get("https://mgi.gaba.jp/gis/view_schedule-ls/list?jp.co.gaba.targetUserStore=")
     past = []
     x = 1
@@ -91,7 +98,7 @@ class ScrapesController < ApplicationController
       link = root.at("a.pull-left")
       previous_page = @mechanize.click(link)
       x += 1
-      parsed_data = weekly_parse(previous_page.search(".day"))
+      parsed_data = weekly_parse(previous_page.search(".day"), date)
       past.concat(parsed_data) if parsed_data.is_a?(Array)
       root = previous_page
       # dates = previous_page.search(".day-desc")
@@ -100,7 +107,7 @@ class ScrapesController < ApplicationController
     past
   end
 
-  def info_pull_future
+  def info_pull_future(date)
     root = @mechanize.get("https://mgi.gaba.jp/gis/view_schedule-ls/list?jp.co.gaba.targetUserStore=")
     future = []
     x = 1
@@ -110,20 +117,20 @@ class ScrapesController < ApplicationController
 
       next_page = @mechanize.click(link)
       x += 1
-      parsed_data = weekly_parse(next_page.search(".day"))
+      parsed_data = weekly_parse(next_page.search(".day"), date)
       future.concat(parsed_data) if parsed_data.is_a?(Array)
       root = next_page
     end
     future
   end
 
-  def weekly_parse(web_page)
+  def weekly_parse(web_page, date)
     peak_times = ["07:00", "07:50", "08:40", "17:10", "18:00", "18:50", "19:40", "20:30", "21:20"]
     lessons = []
     web_page.reverse.each do |day|
       slots = day.search(".booking")
       peak = day.classes.include?("weekend")
-      year = Date.today.year
+      year = date.year
       slots.each do |slot|
         lesson = {}
         str = slot.text.strip
