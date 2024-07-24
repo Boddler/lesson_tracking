@@ -3,7 +3,7 @@
     <div class="info-page">
       <h1>Lessons Updated...</h1>
       <h1 id="menu-btn" data-controller="summary-btn" data-action="click->summary-btn#toggle"><i class="fa-solid fa-list"></i>
-        <div id="summary" class="show" data-summary-btn-target="table">
+        <div id="summary" class="shown" data-summary-btn-target="table">
           <%= render "shared/smry", recent: @recent %>
         </div>
       </h1>

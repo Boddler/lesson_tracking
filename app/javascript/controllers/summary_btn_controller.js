@@ -8,6 +8,6 @@ export default class extends Controller {
   }
 
   toggle() {
-    this.tableTarget.classList.toggle("show");
+    this.tableTarget.classList.toggle("shown");
   }
 }
