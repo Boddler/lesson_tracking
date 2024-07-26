@@ -16,7 +16,6 @@ class ScrapesController < ApplicationController
       end
       session[:scrape_id] = @scrape.id
       session[:user_id] = params[:scrape][:user_id]
-
       redirect_to scrapes_path
     else
       flash[:notice] = "Log in failed - please retry"
@@ -25,8 +24,6 @@ class ScrapesController < ApplicationController
   end
 
   def index
-    # scrape = Scrape.last
-
     users_scrapes = Scrape.where(user_id: session[:user_id])
     prep = users_scrapes.sort_by(&:created_at)
     @scrapes_array = prep.group_by(&:yyyymm).sort_by { |array| array[0] }.reverse
