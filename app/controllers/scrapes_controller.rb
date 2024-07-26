@@ -141,6 +141,7 @@ class ScrapesController < ApplicationController
         peak ||= peak_times.include?(lesson[:time])
         lesson[:peak] = peak
         lesson[:blue] = slot.classes.include?("client")
+        lesson[:related] = slot.classes.include?("related")
         lesson[:booked] = !slot.classes.include?("available")
         lesson[:code] = slot.css(".type").text.strip if lesson[:booked]
         lessons << lesson
