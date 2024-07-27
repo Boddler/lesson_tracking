@@ -11,7 +11,7 @@
         <%= date_title([scrape.yyyymm]) %>
       </th>
       <td><%= scrape.lessons.where(blue: true).count %></td>
-      <td><%= scrape.lessons.where(blue: false).where(booked: true).where.not(code: "L").count %></td>
+      <td><%= scrape.lessons.where(blue: false).where(booked: true).where(related: false).where.not(code: "L").count %></td>
       <td><%= scrape.lessons.where(booked: true).where(related: true).count %></td>
       <td><%= scrape.lessons.where(blue: false).where(booked: true).where(code: "L").count %></td>
       <td><%= scrape.lessons.where(booked: true).count %></td>
