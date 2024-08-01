@@ -16,7 +16,7 @@ class Slot < ApplicationRecord
   def matching_lesson
     return unless updated && !lesson.booked
 
-    previous_scrape = Scrape.find_by(update_no: scrape.update_no - 1)
+    previous_scrape = Scrape.find_by(update_no: scrape.update_no - 1, yyyymm: scrape.yyyymm, user_id: scrape.user_id)
     return unless previous_scrape
 
     Lesson.joins(:slots)
@@ -25,6 +25,3 @@ class Slot < ApplicationRecord
           .first
   end
 end
-
-# matching_lesson only works within the same month
-# I think I need to add a user id match to it too
