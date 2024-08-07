@@ -33,30 +33,6 @@ class ScrapesController < ApplicationController
     @recent = prep.last(3)
   end
 
-  # def destroy
-  #   ActiveRecord::Base.transaction do
-  #     begin
-  #       @scrape = Scrape.find(params[:id])
-  #       scrape_1 = Scrape.find_by(id: @scrape.id - 1)
-  #       scrape_2 = Scrape.find_by(id: @scrape.id - 2)
-
-  #       @scrape.destroy!
-  #       scrape_1&.destroy!
-  #       scrape_2&.destroy!
-
-  #       flash[:notice] = "Latest info pull deleted"
-  #       if Scrape.last
-  #         redirect_to scrapes_path
-  #       else
-  #         redirect_to root_path
-  #       end
-  #     rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordNotDestroyed => e
-  #       flash[:notice] = "Error in deleting the info: #{e.message}"
-  #       redirect_to scrapes_path
-  #     end
-  #   end
-  # end
-
   private
 
   def month_cut(lessons, day)
