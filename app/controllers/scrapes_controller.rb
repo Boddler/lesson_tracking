@@ -1,10 +1,12 @@
 class ScrapesController < ApplicationController
   def create
     submission = log_in
+    @pull = Pull.find(params[:pull_id])
     if submission.links[0].text == "INSTRUCTOR PROFILE"
       day = Date.today.months_ago(1)
-      3.times do
+      1.times do
         @scrape = start(day)
+        @scrape.pull = @pull
         current = info_pull1(day)
         past = info_pull_past(day)
         future = info_pull_future(day)
@@ -15,7 +17,7 @@ class ScrapesController < ApplicationController
         day = day.next_month
       end
       session[:scrape_id] = @scrape.id
-      session[:user_id] = params[:scrape][:user_id]
+      session[:user_id] = params[:user_id]
       redirect_to scrapes_path
     else
       flash[:notice] = "Log in failed - please retry"
@@ -24,35 +26,37 @@ class ScrapesController < ApplicationController
   end
 
   def index
-    users_scrapes = Scrape.where(user_id: session[:user_id])
+    scrape_id = session[:scrape_id]
+    user_id = Scrape.find(scrape_id).user_id
+    users_scrapes = Scrape.where(user_id: user_id)
     prep = users_scrapes.sort_by(&:created_at)
     @scrapes_array = prep.group_by(&:yyyymm).sort_by { |array| array[0] }.reverse
     @recent = prep.last(3)
   end
 
-  def destroy
-    ActiveRecord::Base.transaction do
-      begin
-        @scrape = Scrape.find(params[:id])
-        scrape_1 = Scrape.find_by(id: @scrape.id - 1)
-        scrape_2 = Scrape.find_by(id: @scrape.id - 2)
+  # def destroy
+  #   ActiveRecord::Base.transaction do
+  #     begin
+  #       @scrape = Scrape.find(params[:id])
+  #       scrape_1 = Scrape.find_by(id: @scrape.id - 1)
+  #       scrape_2 = Scrape.find_by(id: @scrape.id - 2)
 
-        @scrape.destroy!
-        scrape_1&.destroy!
-        scrape_2&.destroy!
+  #       @scrape.destroy!
+  #       scrape_1&.destroy!
+  #       scrape_2&.destroy!
 
-        flash[:notice] = "Latest info pull deleted"
-        if Scrape.last
-          redirect_to scrapes_path
-        else
-          redirect_to root_path
-        end
-      rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordNotDestroyed => e
-        flash[:notice] = "Error in deleting the info: #{e.message}"
-        redirect_to scrapes_path
-      end
-    end
-  end
+  #       flash[:notice] = "Latest info pull deleted"
+  #       if Scrape.last
+  #         redirect_to scrapes_path
+  #       else
+  #         redirect_to root_path
+  #       end
+  #     rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordNotDestroyed => e
+  #       flash[:notice] = "Error in deleting the info: #{e.message}"
+  #       redirect_to scrapes_path
+  #     end
+  #   end
+  # end
 
   private
 
@@ -63,12 +67,14 @@ class ScrapesController < ApplicationController
   def start(day)
     yyyymm = "#{day.year}#{"0" if day.month < 10}#{day.month}".to_i
     user_id = params[:scrape][:user_id]
+    pull = Pull.find(params[:pull_id])
     last_update = Scrape.where(user_id: user_id).where(yyyymm: yyyymm).order(:created_at).last
     new_update_no = last_update ? last_update.update_no + 1 : 1
     instance = Scrape.new(
       yyyymm: yyyymm,
       user_id: user_id,
       update_no: new_update_no,
+      pull: pull,
     )
     instance.save
     instance

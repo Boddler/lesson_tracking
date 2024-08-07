@@ -28,14 +28,21 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_23_024206) do
     t.boolean "related", default: false
   end
 
+  create_table "pulls", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "scrapes", force: :cascade do |t|
     t.integer "yyyymm"
     t.string "user_id"
     t.integer "update_no"
+    t.bigint "pull_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.jsonb "comp_next", default: {}
     t.jsonb "comp_this", default: {}
+    t.index ["pull_id"], name: "index_scrapes_on_pull_id"
   end
 
   create_table "slots", force: :cascade do |t|
@@ -48,6 +55,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_23_024206) do
     t.index ["scrape_id"], name: "index_slots_on_scrape_id"
   end
 
+  add_foreign_key "scrapes", "pulls"
   add_foreign_key "slots", "lessons"
   add_foreign_key "slots", "scrapes"
 end

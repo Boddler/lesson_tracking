@@ -1,8 +1,16 @@
 <div>
   <h4>Collect Current Lesson Info</h4>
-  <%= simple_form_for @scrape, url: scrapes_path do |f| %>
-    <%= f.input :user_id, label: 'Instructor ID', input_html: { autocomplete: 'off', value: '' } %>
-    <%= f.input :password %>
-    <%= f.button :submit, 'Pull Data', class: "btn btn-warning", style: "width: 100%"  %>
+  <%= form_with model: [@pull, @scrape], url: pull_scrapes_path(@pull), local: true do |f| %>
+    <div class="form-group">
+      <%= f.label :user_id, 'Instructor ID' %>
+      <%= f.text_field :user_id, autocomplete: 'off', value: '' %>
+    </div>
+    <div class="form-group">
+      <%= f.label :password %>
+      <%= f.password_field :password %>
+    </div>
+    <div class="form-group">
+      <%= f.submit 'Pull Data', class: 'btn btn-warning w-100 mt-3' %>
+    </div>
   <% end %>
 </div>
