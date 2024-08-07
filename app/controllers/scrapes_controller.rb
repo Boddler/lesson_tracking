@@ -4,7 +4,7 @@ class ScrapesController < ApplicationController
     @pull = Pull.find(params[:pull_id])
     if submission.links[0].text == "INSTRUCTOR PROFILE"
       day = Date.today.months_ago(1)
-      1.times do
+      3.times do
         @scrape = start(day)
         @scrape.pull = @pull
         current = info_pull1(day)
@@ -17,7 +17,7 @@ class ScrapesController < ApplicationController
         day = day.next_month
       end
       session[:scrape_id] = @scrape.id
-      session[:user_id] = params[:user_id]
+      session[:user_id] = @scrape.user_id
       redirect_to scrapes_path
     else
       flash[:notice] = "Log in failed - please retry"
@@ -26,8 +26,7 @@ class ScrapesController < ApplicationController
   end
 
   def index
-    scrape_id = session[:scrape_id]
-    user_id = Scrape.find(scrape_id).user_id
+    user_id = session[:user_id]
     users_scrapes = Scrape.where(user_id: user_id)
     prep = users_scrapes.sort_by(&:created_at)
     @scrapes_array = prep.group_by(&:yyyymm).sort_by { |array| array[0] }.reverse
