@@ -29,8 +29,18 @@ class ScrapesController < ApplicationController
     user_id = session[:user_id]
     users_scrapes = Scrape.where(user_id: user_id)
     prep = users_scrapes.sort_by(&:created_at)
-    @scrapes_array = prep.group_by(&:yyyymm).sort_by { |array| array[0] }.reverse
-    @recent = prep.last(3)
+    updated_arrays = prep.reject { |scrape| scrape.slots.all? { |slot| slot.updated == false } }
+    @scrapes_array = updated_arrays.group_by(&:yyyymm).sort_by { |array| array[0] }.reverse
+    prep = prep.group_by(&:yyyymm).sort_by { |array| array[0] }.reverse
+    @recent = []
+    count = 0
+    6.times do
+      @recent << prep[count][-1][0] if prep[count]
+      count += 1
+    end
+    if (users_scrapes.last(3) & prep).empty? && users_scrapes.last.update_no != 1
+      flash[:notice] = "No changes found"
+    end
   end
 
   private
@@ -41,7 +51,7 @@ class ScrapesController < ApplicationController
 
   def start(day)
     yyyymm = "#{day.year}#{"0" if day.month < 10}#{day.month}".to_i
-    user_id = params[:scrape][:user_id]
+    user_id = params[:user_id]
     pull = Pull.find(params[:pull_id])
     last_update = Scrape.where(user_id: user_id).where(yyyymm: yyyymm).order(:created_at).last
     new_update_no = last_update ? last_update.update_no + 1 : 1
@@ -58,8 +68,8 @@ class ScrapesController < ApplicationController
   def log_in
     @mechanize = Mechanize.new
     login_form = @mechanize.get("https://mgi.gaba.jp/gis/login/login?form").form
-    login_form.username = params[:scrape][:user_id]
-    login_form.password = params[:scrape][:password]
+    login_form.username = params[:user_id]
+    login_form.password = params[:password]
     @mechanize.submit(login_form, login_form.buttons.first)
   end
 

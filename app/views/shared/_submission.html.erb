@@ -1,14 +1,14 @@
 <div>
   <h4>Collect Current Lesson Info</h4>
-<%= form_with url: pulls_path, local: true do |f| %>
+  <%= form_with url: pull_scrapes_path(@pull), local: true do |f| %>
     <div class="my-2">
       <%= f.label :user_id, 'Instructor ID' %>
       <%= f.text_field :user_id, autocomplete: 'off', value: '', class: 'w-100 p-1' %>
-      </div>
+    </div>
     <div class="my-2">
       <%= f.label :password %>
     </div>
-      <%= f.password_field :password, class: 'w-100 p-1' %>
+    <%= f.password_field :password, class: 'w-100 p-1' %>
     <div class="form-group">
       <%= f.submit 'Pull Data', class: 'btn btn-warning w-100 mt-3' %>
     </div>
