@@ -1,5 +1,8 @@
 class PullsController < ApplicationController
   def create
+    @pull = Pull.new
+    @pull.save
+    redirect_to pull_scrapes_path(@pull)
   end
 
   def destroy
