@@ -6,7 +6,6 @@ class ScrapesController < ApplicationController
       day = Date.today.months_ago(1)
       3.times do
         @scrape = start(day)
-        @scrape.pull = @pull
         current = info_pull1(day)
         past = info_pull_past(day)
         future = info_pull_future(day)
@@ -35,12 +34,13 @@ class ScrapesController < ApplicationController
     @recent = []
     count = 0
     6.times do
-      @recent << prep[count][-1][0] if prep[count]
+      @recent << prep[count][-1][-1] if prep[count]
       count += 1
     end
-    if (users_scrapes.last(3) & prep).empty? && users_scrapes.last.update_no != 1
-      flash[:notice] = "No changes found"
-    end
+    # if (users_scrapes.last(3).flatten & prep).empty? && users_scrapes.last.update_no != 1
+    #   # This bit is borked
+    #   flash[:notice] = "No changes found"
+    # end
   end
 
   private
