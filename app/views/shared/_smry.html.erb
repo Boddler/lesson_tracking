@@ -5,7 +5,7 @@
   <th>Rs</th>
   <th>Reds</th>
   <th>Total</th>
-  <% recent.reverse.each do |scrape| %>
+  <% recent.each do |scrape| %>
     <tr>
       <th>
         <%= date_title([scrape.yyyymm]) %>

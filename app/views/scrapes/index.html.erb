@@ -11,7 +11,7 @@
     <h6>Here are the results of your most recent check...</h6>
     <table>
       <%= render "shared/table_smry", recent: @recent %>
-      <%= render "shared/slot", month: @recent.last(2) %>
+      <%= render "shared/slot", month: @recent.first(2).reverse %>
       <tr>
       </tr>
       <tr class="invisible-row">
