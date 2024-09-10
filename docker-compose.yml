@@ -1,0 +1,27 @@
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: yourpassword
+      POSTGRES_DB: yourdatabase
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  web:
+    build: .
+    command: ["rails", "server", "-b", "0.0.0.0"]
+    volumes:
+      - .:/myapp
+    ports:
+      - "4000:4000"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: "postgres://postgres:yourpassword@db:5432/yourdatabase"
+    restart: always
+    stdin_open: true
+    tty: true
+
+volumes:
+  postgres_data:
