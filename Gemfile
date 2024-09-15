@@ -79,3 +79,5 @@ end
 
 gem "nokogiri"
 gem "mechanize"
+gem "sidekiq"
+gem "sidekiq-cron"
