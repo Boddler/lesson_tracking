@@ -1,7 +1,8 @@
-class AutoCheckJob < ApplicationJob
-  queue_as :default
+class AutoCheckJob
+  include Sidekiq::Worker
 
   def perform(*args)
-    # Do something later
+    # The task to run at 55 minutes past the hour
+    puts "Running AutoCheckJob"
   end
 end

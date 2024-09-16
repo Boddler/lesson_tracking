@@ -9,7 +9,7 @@ Sidekiq.configure_client do |config|
 end
 
 Sidekiq::Cron::Job.create(
-  name: "AutoCheck - every hour at 55 minutes past",
-  cron: "55 * * * *",
-  class: "AutoCheck",
+  name: "AutoCheck - every hour at 13 minutes past",
+  cron: "13 * * * *",
+  class: "AutoCheckJob",
 )
