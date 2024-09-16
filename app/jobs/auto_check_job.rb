@@ -2,7 +2,7 @@ class AutoCheckJob
   include Sidekiq::Worker
 
   def perform(*args)
-    # The task to run at 55 minutes past the hour
-    puts "Running AutoCheckJob"
+    # Log the message to Sidekiq logs
+    Sidekiq.logger.info "Running AutoCheckJob"
   end
 end
