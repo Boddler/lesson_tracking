@@ -37,10 +37,6 @@ class ScrapesController < ApplicationController
       @recent << prep[count][-1][-1] if prep[count]
       count += 1
     end
-    # if (users_scrapes.last(3).flatten & prep).empty? && users_scrapes.last.update_no != 1
-    #   # This bit is borked
-    #   flash[:notice] = "No changes found"
-    # end
   end
 
   private
@@ -89,8 +85,6 @@ class ScrapesController < ApplicationController
       parsed_data = weekly_parse(previous_page.search(".day"), date)
       past.concat(parsed_data) if parsed_data.is_a?(Array)
       root = previous_page
-      # dates = previous_page.search(".day-desc")
-      # break if dates[1].text.strip[0, 2].to_i > dates[7].text.strip[0, 2].to_i unless day < Date.today
     end
     past
   end
@@ -120,10 +114,10 @@ class ScrapesController < ApplicationController
       peak = day.classes.include?("weekend")
       year = date.year
       slots.each do |slot|
-        lesson = {}
         str = slot.text.strip
         next if str.nil?
 
+        lesson = {}
         lesson[:time] = slot.css(".time").text.strip
         date_str = slot.css(".date-time").text.strip[0, 6]
         lesson[:date] = Date.parse("#{date_str} #{year}")
