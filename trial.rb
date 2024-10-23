@@ -13,10 +13,17 @@ mechanize.submit(login_form, login_form.buttons.first)
 
 # scrape = Scrape.new
 
-page = mechanize.get("https://mgi.gaba.jp/gis/view_schedule-ls/list?jp.co.gaba.targetUserStore=")
+# page = mechanize.get("https://mgi.gaba.jp/gis/view_schedule-ls/list?jp.co.gaba.targetUserStore=")
 
-dates = page.search(".day-desc")
+# dates = page.search(".day-desc")
 
-pp dates[1].text.strip[0, 2].to_i > dates[7].text.strip[0, 2].to_i
+# pp dates[1].text.strip[0, 2].to_i > dates[7].text.strip[0, 2].to_i
 
-puts "#{dates[1].text.strip[0, 2]} is the first date and #{dates[7].text.strip[0, 2]} is the last"
+# puts "#{dates[1].text.strip[0, 2]} is the first date and #{dates[7].text.strip[0, 2]} is the last"
+
+days = mechanize.get("https://mgi.gaba.jp/gis/view_schedule-ls/list?jp.co.gaba.targetUserStore=").search(".day")
+
+days.each do |day|
+  # pp day.search(".date-time").text.strip[0, 6].split(" ").last.to_i
+  pp Date::ABBR_MONTHNAMES.index(day.search(".date-time").text.strip[0, 6].split(" ").first)
+end

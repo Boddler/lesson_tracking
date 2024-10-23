@@ -6,8 +6,10 @@ class ScrapesController < ApplicationController
       day = Date.today.months_ago(1)
       3.times do
         @scrape = start(day)
-        current = info_pull1(day)
+        # Identify the last scrape for this month
         last_scrape = Scrape.all.where(user_id: @scrape.user_id).where(yyyymm: @scrape.yyyymm).last
+        # send its creation date to the pull
+        current = info_pull1(day, last_scrape.created_at)
         if last_scrape && last_scrape.created_at > day.end_of_month
           past = []
         else
@@ -74,9 +76,18 @@ class ScrapesController < ApplicationController
     @mechanize.submit(login_form, login_form.buttons.first)
   end
 
-  def info_pull1(date)
+  def info_pull1(date, last_scrape_date)
     days = @mechanize.get("https://mgi.gaba.jp/gis/view_schedule-ls/list?jp.co.gaba.targetUserStore=").search(".day")
-    weekly_parse(days, date)
+    desired_days = []
+    days.each do |day|
+      date_text = day.search(".date-time").text.strip.split(" ")
+      month = Date::ABBR_MONTHNAMES.index(date_text.first)
+      day_number = date_text.last.to_i
+      desired_days << day if month >= Date.today.month && day_number >= last_scrape_date.day
+      # problem as it rejects next month's days if lower than last_scrape_date.day
+      # Eg Dec 10th gets rejected if Nov 29th was the last scrape date
+    end
+    weekly_parse(desired_days, date)
   end
 
   def info_pull_past(date)
