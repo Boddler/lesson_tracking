@@ -7,7 +7,12 @@ class ScrapesController < ApplicationController
       3.times do
         @scrape = start(day)
         current = info_pull1(day)
-        past = info_pull_past(day)
+        last_scrape = Scrape.all.where(user_id: @scrape.user_id).where(yyyymm: @scrape.yyyymm).last
+        if last_scrape && last_scrape.created_at > day.end_of_month
+          past = []
+        else
+          past = info_pull_past(day)
+        end
         future = info_pull_future(day)
         all = current + past + future
         trimmed_lsns = month_cut(all, day)
