@@ -1,27 +1,42 @@
 class ScrapesController < ApplicationController
   def create
+    # log in to the site
     submission = log_in
     @pull = Pull.find(params[:pull_id])
+    # check if logged in
+    @date = Date.today.months_ago(1)
+    @root = @mechanize.get("https://mgi.gaba.jp/gis/view_schedule-ls/list?jp.co.gaba.targetUserStore=")
     if submission.links[0].text == "INSTRUCTOR PROFILE"
-      day = Date.today.months_ago(1)
-      3.times do
-        @scrape = start(day)
-        # Identify the last scrape for this month
-        last_scrape = Scrape.all.where(user_id: @scrape.user_id).where(yyyymm: @scrape.yyyymm).last
-        # send its creation date to the pull
-        current = info_pull1(day, last_scrape.created_at)
-        if last_scrape && last_scrape.created_at > day.end_of_month
-          past = []
-        else
-          past = info_pull_past(day)
-        end
-        future = info_pull_future(day)
-        all = current + past + future
-        trimmed_lsns = month_cut(all, day)
-        lesson_save(trimmed_lsns)
-        @scrape.lesson_count(day)
-        day = day.next_month
-      end
+      @scrape = start
+      past = info_pull_past(date, root)
+
+      # do one scrape per month
+      # scrape the previous month if needed
+      # compile the days into an array rejecting dates already finalised
+      # scrape the current month rejecting dates already finalised
+      # scrape the future month
+      # compile all the days and send them to the save functions
+      date = date.next_month
+
+      # day = Date.today.months_ago(1)
+      # 3.times do
+      #   @scrape = start(day)
+      #   # Identify the last scrape for this month
+      #   last_scrape = Scrape.all.where(user_id: @scrape.user_id).where(yyyymm: @scrape.yyyymm).last
+      #   # send its creation date to the pull
+      #   current = info_pull1(day, last_scrape.created_at)
+      #   if last_scrape && last_scrape.created_at > day.end_of_month
+      #     past = []
+      #   else
+      #     past = info_pull_past(day)
+      #   end
+      #   future = info_pull_future(day)
+      #   all = current + past + future
+      #   trimmed_lsns = month_cut(all, day)
+      #   lesson_save(trimmed_lsns)
+      #   @scrape.lesson_count(day)
+      #   day = day.next_month
+      # end
       session[:scrape_id] = @scrape.id
       session[:user_id] = @scrape.user_id
       redirect_to scrapes_path
@@ -48,12 +63,13 @@ class ScrapesController < ApplicationController
 
   private
 
-  def month_cut(lessons, day)
-    lessons.select { |lesson| lesson[:date].month == day.month }
+  def month_cut(lessons)
+    # don't think we need this now
+    lessons.select { |lesson| lesson[:date].month == @date.month }
   end
 
-  def start(day)
-    yyyymm = "#{day.year}#{"0" if day.month < 10}#{day.month}".to_i
+  def start
+    yyyymm = "#{@date.year}#{"0" if @date.month < 10}#{@date.month}".to_i
     user_id = params[:user_id]
     pull = Pull.find(params[:pull_id])
     last_update = Scrape.where(user_id: user_id).where(yyyymm: yyyymm).order(:created_at).last
@@ -68,15 +84,7 @@ class ScrapesController < ApplicationController
     instance
   end
 
-  def log_in
-    @mechanize = Mechanize.new
-    login_form = @mechanize.get("https://mgi.gaba.jp/gis/login/login?form").form
-    login_form.username = params[:user_id]
-    login_form.password = params[:password]
-    @mechanize.submit(login_form, login_form.buttons.first)
-  end
-
-  def info_pull1(date, last_scrape_date)
+  def info_pull_current(date)
     days = @mechanize.get("https://mgi.gaba.jp/gis/view_schedule-ls/list?jp.co.gaba.targetUserStore=").search(".day")
     desired_days = []
     days.each do |day|
@@ -90,18 +98,20 @@ class ScrapesController < ApplicationController
     weekly_parse(desired_days, date)
   end
 
-  def info_pull_past(date)
-    root = @mechanize.get("https://mgi.gaba.jp/gis/view_schedule-ls/list?jp.co.gaba.targetUserStore=")
+  def info_pull_past
     past = []
-    x = 1
-    until x == 10
-      link = root.at("a.pull-left")
-      previous_page = @mechanize.click(link)
-      x += 1
-      parsed_data = weekly_parse(previous_page.search(".day"), date)
-      past.concat(parsed_data) if parsed_data.is_a?(Array)
-      root = previous_page
-    end
+    monthly_view = @mechanize.click(root.at(".day-desc a"))
+    previous_month = @mechanize.click(monthly_view(""))
+    # x = 1
+    # until x == 10
+    #   link = root.at("a.pull-left")
+    #   previous_page = @mechanize.click(link)
+    #   x += 1
+    #   parsed_data = weekly_parse(previous_page.search(".day"), date)
+    #   past.concat(parsed_data) if parsed_data.is_a?(Array)
+    #   root = previous_page
+    # end
+    @date = @date.next_month
     past
   end
 
@@ -139,8 +149,7 @@ class ScrapesController < ApplicationController
         lesson[:date] = Date.parse("#{date_str} #{year}")
         lesson[:ls] = slot.css(".school").text.strip
         lesson[:text] = slot.css(".textbookname").text.strip
-        peak ||= peak_times.include?(lesson[:time])
-        lesson[:peak] = peak
+        lesson[:peak] = peak_times.include?(lesson[:time])
         lesson[:blue] = slot.classes.include?("client")
         lesson[:related] = slot.classes.include?("related")
         lesson[:booked] = !slot.classes.include?("available")
@@ -153,5 +162,13 @@ class ScrapesController < ApplicationController
 
   def lesson_save(lessons)
     lessons.each { |lesson| @scrape.add_lesson(lesson) }
+  end
+
+  def log_in
+    @mechanize = Mechanize.new
+    login_form = @mechanize.get("https://mgi.gaba.jp/gis/login/login?form").form
+    login_form.username = params[:user_id]
+    login_form.password = params[:password]
+    @mechanize.submit(login_form, login_form.buttons.first)
   end
 end
