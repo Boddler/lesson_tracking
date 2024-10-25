@@ -5,38 +5,18 @@ class ScrapesController < ApplicationController
     @pull = Pull.find(params[:pull_id])
     # check if logged in
     @date = Date.today.months_ago(1)
-    @root = @mechanize.get("https://mgi.gaba.jp/gis/view_schedule-ls/list?jp.co.gaba.targetUserStore=")
+    main_page = @mechanize.get("https://mgi.gaba.jp/gis/view_schedule-ls/list?jp.co.gaba.targetUserStore=")
+    monthly_view = @mechanize.click(main_page.at(".day-desc a"))
     if submission.links[0].text == "INSTRUCTOR PROFILE"
       @scrape = start
-      past = info_pull_past(date, root)
-
-      # do one scrape per month
-      # scrape the previous month if needed
-      # compile the days into an array rejecting dates already finalised
-      # scrape the current month rejecting dates already finalised
-      # scrape the future month
-      # compile all the days and send them to the save functions
-      date = date.next_month
-
-      # day = Date.today.months_ago(1)
-      # 3.times do
-      #   @scrape = start(day)
-      #   # Identify the last scrape for this month
-      #   last_scrape = Scrape.all.where(user_id: @scrape.user_id).where(yyyymm: @scrape.yyyymm).last
-      #   # send its creation date to the pull
-      #   current = info_pull1(day, last_scrape.created_at)
-      #   if last_scrape && last_scrape.created_at > day.end_of_month
-      #     past = []
-      #   else
-      #     past = info_pull_past(day)
-      #   end
-      #   future = info_pull_future(day)
-      #   all = current + past + future
-      #   trimmed_lsns = month_cut(all, day)
-      #   lesson_save(trimmed_lsns)
-      #   @scrape.lesson_count(day)
-      #   day = day.next_month
-      # end
+      past = info_pull_past(monthly_view)
+      @scrape = start
+      current = info_pull_current(monthly_view)
+      @scrape = start
+      future = info_pull_future(monthly_view)
+      all = past + current + future
+      lesson_save(all)
+      @scrape.lesson_count(@date)
       session[:scrape_id] = @scrape.id
       session[:user_id] = @scrape.user_id
       redirect_to scrapes_path
@@ -84,72 +64,53 @@ class ScrapesController < ApplicationController
     instance
   end
 
-  def info_pull_current(date)
-    days = @mechanize.get("https://mgi.gaba.jp/gis/view_schedule-ls/list?jp.co.gaba.targetUserStore=").search(".day")
-    desired_days = []
-    days.each do |day|
-      date_text = day.search(".date-time").text.strip.split(" ")
-      month = Date::ABBR_MONTHNAMES.index(date_text.first)
-      day_number = date_text.last.to_i
-      desired_days << day if month >= Date.today.month && day_number >= last_scrape_date.day
-      # problem as it rejects next month's days if lower than last_scrape_date.day
-      # Eg Dec 10th gets rejected if Nov 29th was the last scrape date
-    end
-    weekly_parse(desired_days, date)
-  end
-
-  def info_pull_past
-    past = []
-    monthly_view = @mechanize.click(root.at(".day-desc a"))
-    previous_month = @mechanize.click(monthly_view(""))
-    # x = 1
-    # until x == 10
-    #   link = root.at("a.pull-left")
-    #   previous_page = @mechanize.click(link)
-    #   x += 1
-    #   parsed_data = weekly_parse(previous_page.search(".day"), date)
-    #   past.concat(parsed_data) if parsed_data.is_a?(Array)
-    #   root = previous_page
-    # end
+  def info_pull_current(monthly_view)
+    lessons = []
+    parsed_data = weekly_parse(monthly_view)
+    lessons.concat(parsed_data) if parsed_data.is_a?(Array)
+    @scrape.lesson_count(@date)
     @date = @date.next_month
-    past
+    lessons
   end
 
-  def info_pull_future(date)
-    root = @mechanize.get("https://mgi.gaba.jp/gis/view_schedule-ls/list?jp.co.gaba.targetUserStore=")
-    future = []
-    x = 1
-    until x == 10
-      link = root.at("a.pull-right")
-      break if link.nil?
-
-      next_page = @mechanize.click(link)
-      x += 1
-      parsed_data = weekly_parse(next_page.search(".day"), date)
-      future.concat(parsed_data) if parsed_data.is_a?(Array)
-      root = next_page
-    end
-    future
+  def info_pull_past(monthly_view)
+    lessons = []
+    month = @mechanize.click(monthly_view.at("a.pull-left"))
+    parsed_data = weekly_parse(month)
+    lessons.concat(parsed_data) if parsed_data.is_a?(Array)
+    @scrape.lesson_count(@date)
+    @date = @date.next_month
+    lessons
   end
 
-  def weekly_parse(web_page, date)
+  def info_pull_future(monthly_view)
+    lessons = []
+    month = @mechanize.click(monthly_view.at("a.pull-right"))
+    parsed_data = weekly_parse(month)
+    lessons.concat(parsed_data) if parsed_data.is_a?(Array)
+    lessons
+  end
+
+  def weekly_parse(web_page)
     peak_times = ["07:00", "07:50", "08:40", "17:10", "18:00", "18:50", "19:40", "20:30", "21:20"]
     lessons = []
-    web_page.reverse.each do |day|
+    month = web_page.css(".month").text.strip
+    year = web_page.css(".year").text.strip
+    days = web_page.search(".day")
+    days.reverse.each do |day|
       slots = day.search(".booking")
       peak = day.classes.include?("weekend")
-      year = date.year
+      day_name = day.css(".day-link").text.strip.split.first
       slots.each do |slot|
         str = slot.text.strip
         next if str.nil?
 
         lesson = {}
         lesson[:time] = slot.css(".time").text.strip
-        date_str = slot.css(".date-time").text.strip[0, 6]
-        lesson[:date] = Date.parse("#{date_str} #{year}")
+        lesson[:date] = Date.parse(day_name + " " + month + " " + year)
         lesson[:ls] = slot.css(".school").text.strip
         lesson[:text] = slot.css(".textbookname").text.strip
-        lesson[:peak] = peak_times.include?(lesson[:time])
+        lesson[:peak] = peak || peak_times.include?(lesson[:time])
         lesson[:blue] = slot.classes.include?("client")
         lesson[:related] = slot.classes.include?("related")
         lesson[:booked] = !slot.classes.include?("available")
