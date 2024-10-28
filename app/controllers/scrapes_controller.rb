@@ -17,7 +17,6 @@ class ScrapesController < ApplicationController
       @scrape = start
       future = info_pull_future(monthly_view)
       lesson_save(future)
-      # @scrape.lesson_count(@date)
       session[:scrape_id] = @scrape.id
       session[:user_id] = @scrape.user_id
       redirect_to scrapes_path
@@ -43,11 +42,6 @@ class ScrapesController < ApplicationController
   end
 
   private
-
-  def month_cut(lessons)
-    # don't think we need this now
-    lessons.select { |lesson| lesson[:date].month == @date.month }
-  end
 
   def start
     yyyymm = "#{@date.year}#{"0" if @date.month < 10}#{@date.month}".to_i
