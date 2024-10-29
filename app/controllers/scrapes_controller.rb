@@ -27,17 +27,17 @@ class ScrapesController < ApplicationController
   end
 
   def index
+    date = Date.today << 2
     user_id = session[:user_id]
     users_scrapes = Scrape.where(user_id: user_id)
     prep = users_scrapes.sort_by(&:created_at)
     updated_arrays = prep.reject { |scrape| scrape.slots.all? { |slot| slot.updated == false } }
+    updated_arrays = updated_arrays.reject { |scrape| Date.strptime(scrape.yyyymm.to_s, '%Y%m') < date }
     @scrapes_array = updated_arrays.group_by(&:yyyymm).sort_by { |array| array[0] }.reverse
     prep = prep.group_by(&:yyyymm).sort_by { |array| array[0] }.reverse
     @recent = []
-    count = 0
-    6.times do
-      @recent << prep[count][-1][-1] if prep[count]
-      count += 1
+    6.times do |i|
+      @recent << prep[i][-1][-1] if prep[i]
     end
   end
 
