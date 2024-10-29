@@ -25,3 +25,9 @@ class Slot < ApplicationRecord
           .first
   end
 end
+
+# Maybe...
+#     prev_record = Slot.joins(:scrape)
+# .where(scrapes: { update_no: previous_update_no, user_id: scrape.user_id }, lesson_id: lesson_id)
+# .exists?
+# self.updated = !prev_record unless (lesson.date + 1) < prev_record.lesson.updated_at

@@ -1,6 +1,4 @@
 class PullsController < ApplicationController
-  def create
-  end
 
   def destroy
     pull = Pull.find(params[:id])

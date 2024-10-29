@@ -21,6 +21,7 @@ class Scrape < ApplicationRecord
   end
 
   def lesson_count(date)
+    # don't think this is getting used at the moment
     month = date.month
     blues = slots.joins(:lesson)
                  .where(lessons: { booked: true, blue: true })
