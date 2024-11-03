@@ -5,12 +5,18 @@ class ScrapesController < ApplicationController
     @pull = Pull.find(params[:pull_id])
     # check if logged in
     @date = Date.today.months_ago(1)
+    code = "#{@date.year}#{"0" if @date.month < 10}#{@date.month}".to_i
     if submission.links[0].text == "INSTRUCTOR PROFILE"
       main_page = @mechanize.get("https://mgi.gaba.jp/gis/view_schedule-ls/list?jp.co.gaba.targetUserStore=")
       monthly_view = @mechanize.click(main_page.at(".day-desc a"))
-      @scrape = start
-      past = info_pull_past(monthly_view)
-      lesson_save(past)
+      last_scrape = Scrape.where(user_id: params[:user_id]).where(yyyymm: code).max_by(&:update_no)
+      if last_scrape.created_at < @date.next_month.beginning_of_month
+        @scrape = start
+        past = info_pull_past(monthly_view)
+        lesson_save(past)
+      else
+        @date = @date.next_month
+      end
       @scrape = start
       current = info_pull_current(monthly_view)
       lesson_save(current)
