@@ -5,12 +5,12 @@ class Slot < ApplicationRecord
   # validates :lesson_id, presence: true
 
   def check_for_changes
+    today = Date.today
     scrape = Scrape.find(scrape_id)
     previous_update_no = scrape.update_no - 1
     existing_record = Slot.joins(:scrape)
-                          .where(scrapes: { update_no: previous_update_no, user_id: scrape.user_id }, lesson_id: lesson_id)
-                          .exists?
-    self.updated = !existing_record
+                          .where(scrapes: { update_no: previous_update_no, user_id: scrape.user_id }, lesson_id: lesson_id).first
+    self.updated = existing_record.nil? || (existing_record.lesson.booked && existing_record.created_at < existing_record.lesson.date && existing_record.lesson.date < today)
   end
 
   def matching_lesson
