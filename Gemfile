@@ -79,3 +79,4 @@ end
 
 gem "nokogiri"
 gem "mechanize"
+gem "http"
