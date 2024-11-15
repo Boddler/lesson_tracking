@@ -56,13 +56,16 @@ class LineMessage
         new_lessons << slot.lesson if slot.updated
       end
     end
-    interpolate(new_lessons)
+    interpolate(new_lessons.sort_by(&:date))
   end
 
   def interpolate(lsns)
     array = []
+    today = Date.today
     lsns.each do |lsn|
-      array << "#{lsn.ls} - #{lsn.date} - #{lsn.time} - #{lsn.text}\n"
+      if lsn.date >= today && lsn.booked
+        array << "#{lsn.ls} - #{lsn.date} - #{lsn.time} - #{lsn.text}\n"
+      end
     end
     message = (["New Lessons: \n"].concat(array)).reduce(:+)
     if message.size > 4900
