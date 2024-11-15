@@ -80,3 +80,4 @@ end
 gem "nokogiri"
 gem "mechanize"
 gem "http"
+gem "line-bot-api"

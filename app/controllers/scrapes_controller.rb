@@ -25,6 +25,8 @@ class ScrapesController < ApplicationController
       lesson_save(future)
       session[:scrape_id] = @scrape.id
       session[:user_id] = @scrape.user_id
+      line = LineMessage.new(ENV["LINEID"])
+      line.call(@pull)
       redirect_to scrapes_path
     else
       flash[:notice] = "Log in failed - please retry"
