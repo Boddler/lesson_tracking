@@ -7,7 +7,7 @@ Dotenv.load
 access_token = ENV["LINETOKEN"]
 
 message_text = "Last one for today"
-recipient_user_id = ENV["LINEID"] # Replace with the user ID you want to send the message to
+recipient_user_id = ENV["LINEID"]
 
 # Prepare the HTTP request
 uri = URI.parse("https://api.line.me/v2/bot/message/push")
