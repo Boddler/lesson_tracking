@@ -3,6 +3,8 @@ require 'uri'
 require 'json'
 
 class LineMessage
+  include ApplicationHelper
+
   def initialize(params)
     @line_id = params
   end
@@ -64,7 +66,7 @@ class LineMessage
     today = Date.today
     lsns.each do |lsn|
       if lsn.date >= today && lsn.booked
-        array << "#{lsn.ls} - #{lsn.date} - #{lsn.time} - #{lsn.text}\n"
+        array << "#{lsn.ls} - #{lsn.date} - #{lsn.time} - #{text_title(lsn.text)}\n"
       end
     end
     message = (["New Lessons: \n"].concat(array)).reduce(:+)

@@ -1,4 +1,6 @@
 class ScrapesController < ApplicationController
+  include ApplicationHelper
+
   def create
     # log in to the site
     submission = log_in
