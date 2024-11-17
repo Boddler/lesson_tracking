@@ -82,3 +82,6 @@ gem "mechanize"
 gem "http"
 gem "line-bot-api"
 gem 'ostruct'
+gem 'redis'
+gem 'sidekiq'
+gem 'foreman'
