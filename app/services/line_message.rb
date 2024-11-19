@@ -20,6 +20,8 @@ class LineMessage
   def perform_action(pull)
     access_token = ENV["LINETOKEN"]
     message_text = build_message(pull)
+    return if pull.nil?
+
     uri = URI.parse("https://api.line.me/v2/bot/message/push")
     header = {
       "Content-Type" => "application/json",
@@ -69,9 +71,12 @@ class LineMessage
         array << "#{lsn.ls} - #{lsn.date} - #{lsn.time} - #{text_title(lsn.text)}\n"
       end
     end
+    if array.empty?
+      return nil
+    end
     message = (["New Lessons: \n"].concat(array)).reduce(:+)
-    if message.size > 4900
-      message = message.slice(0, 4900) + "\n..... \nMessage too long - please check the web"
+    if message.size > 4999
+      message = message.slice(0, 4950) + "\n..... \nMessage too long - please check the web"
     end
     message
   end
