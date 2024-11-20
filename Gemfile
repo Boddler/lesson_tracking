@@ -82,3 +82,4 @@ gem "mechanize"
 gem "http"
 gem "line-bot-api"
 gem 'ostruct'
+gem 'whenever', require: false
