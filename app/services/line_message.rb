@@ -10,18 +10,25 @@ class LineMessage
   end
 
   def call(pull)
-    perform_action(pull)
+    if pull.nil?
+      puts "No info found in the pull"
+      return
+    end
+    message = parse(pull)
+    if message.nil?
+      puts "No new lessons found"
+      return
+    end
+    message_text = build_message(message)
+    perform_action(message_text)
   end
 
   private
 
   attr_reader :params
 
-  def perform_action(pull)
+  def perform_action(message)
     access_token = ENV["LINETOKEN"]
-    message_text = build_message(pull)
-    return if pull.nil?
-
     uri = URI.parse("https://api.line.me/v2/bot/message/push")
     header = {
       "Content-Type" => "application/json",
@@ -31,7 +38,7 @@ class LineMessage
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     request = Net::HTTP::Post.new(uri.request_uri, header)
-    request.body = message_text.to_json
+    request.body = message.to_json
     response = http.request(request)
     if response.is_a?(Net::HTTPSuccess)
       puts "Message sent successfully!"
@@ -40,8 +47,7 @@ class LineMessage
     end
   end
 
-  def build_message(pull)
-    message = parse(pull)
+  def build_message(message)
     {
       to: @line_id,
       messages: [
