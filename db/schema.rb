@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_11_17_073303) do
+ActiveRecord::Schema[8.0].define(version: 2024_11_23_115648) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -31,6 +31,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_11_17_073303) do
   create_table "pulls", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "automated", default: false, null: false
   end
 
   create_table "scrapes", force: :cascade do |t|

@@ -1,0 +1,3 @@
+Scheduled task procs
+Run a pull method with userid from the env file
+run scrapes
