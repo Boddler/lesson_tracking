@@ -21,3 +21,7 @@
 
 # When a new task is added, run this in the cli:
 # whenever --update-crontab
+
+every 2.hours, at: '15 minutes past the hour' do
+  command "echo 'help'"
+end

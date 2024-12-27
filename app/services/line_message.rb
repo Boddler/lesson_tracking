@@ -71,16 +71,27 @@ class LineMessage
 
   def interpolate(lsns)
     array = []
+    new_lsns = lsns.select { |lsn| lsn.booked }
+    cnc_lsns = lsns.reject { |lsn| lsn.booked }
     today = Date.today
-    lsns.each do |lsn|
-      if lsn.date >= today && lsn.booked
-        array << "#{lsn.ls} - #{lsn.date} - #{lsn.time} - #{text_title(lsn.text)}\n"
+    new_lsns.each do |lsn|
+      if lsn.date >= today
+        array << "\n#{lsn.ls} - #{lsn.date} - #{lsn.time} - #{text_title(lsn.text)}"
+      end
+    end
+    unless cnc_lsns.empty?
+      array << "\n\nCancelled Lessons:"
+      cnc_lsns.each do |lsn|
+        old_lsn = lsn.slots.last.matching_lesson
+        if lsn.date >= today
+          array << "\n#{lsn.ls} - #{lsn.date} - #{lsn.time} - #{text_title(old_lsn.text) if old_lsn}"
+        end
       end
     end
     if array.empty?
       return nil
     end
-    message = (["New Lessons: \n"].concat(array)).reduce(:+)
+    message = (["New Lessons:"].concat(array)).reduce(:+)
     if message.size > 4999
       message = message.slice(0, 4950) + "\n..... \nMessage too long - please check the web"
     end

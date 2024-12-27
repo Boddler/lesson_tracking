@@ -1,3 +1,5 @@
+add attribute to pull saying if it is automated
+
 Scheduled task procs
 Run a pull method with userid from the env file
-run scrapes
+run scrapes on that pull instance
